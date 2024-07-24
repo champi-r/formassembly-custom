@@ -1,0 +1,1850 @@
+<style>
+    .swal2-title {
+        font-family: 'Montserrat', sans-serif;
+    }
+
+    .display-none {
+        display: none;
+    }
+
+    #tfa_734-D>label,
+    #tfa_734-D>.inputWrapper {
+        display: none;
+    }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const webservice = "https://pagos.barcelo.edu.ar/backend_fa/ws_formassembly.php";
+        const input_tfa699 = document.getElementById("tfa_699");
+        const input_tfa701 = document.getElementById("tfa_701");
+        const input_tfa720 = document.getElementById("tfa_720");
+        const input_tfa840 = document.getElementById("tfa_840");
+        const input_tfa162 = document.getElementById("tfa_162");
+        const input_tfa156 = document.getElementById("tfa_156");
+        const input_tfa1 = document.getElementById("tfa_1");
+        const select_tfa182 = document.getElementById("tfa_182");
+
+
+
+        let exigenciaCampoPractico = "";
+        let exigenciaSedePreferencia = "";
+
+        /******* UNIVERSIDAD ENFERMERIA - INPUT TFA734 *******/
+        const input_tfa732 = document.getElementById("tfa_732");
+        const input_tfa733 = document.getElementById("tfa_733");
+
+        const input_tfa734 = document.getElementById("tfa_734");
+        const input_tfa734_d = document.getElementById("tfa_734-D");
+        const select_tfa734 = document.createElement('select');
+        let urlWsUniversidadEnfermeria = webservice + "?ws_name=universidadesEnfermeria";
+
+        if (input_tfa734.value == "") {
+            select_tfa734.className = "required";
+
+            let firstOption_tfa734 = document.createElement('option');
+            firstOption_tfa734.textContent = "Selecciona por favor";
+            select_tfa734.appendChild(firstOption_tfa734);
+
+            fetch(urlWsUniversidadEnfermeria, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            })
+                .then(response => response.json())
+                .then(data => {
+
+                    // Agrega las opciones al select
+                    data.forEach(function (d) {
+                        let option = document.createElement('option');
+                        option.textContent = d["D_UNIVERSIDAD_ENFERMERIA"];
+                        option.value = d["C_UNIVERSIDAD_ENFERMERIA"];
+                        select_tfa734.appendChild(option);
+                    });
+
+                    contenedorSelect("Universidad en la que se recibió", select_tfa734, input_tfa734_d, input_tfa734_d.id);
+
+                    const input_tfa734_fa = document.getElementById("tfa_734-D-fa");
+
+                    input_tfa734_d.appendChild(input_tfa734_fa);
+
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+
+            // Escucha el evento change en el select
+            select_tfa734.addEventListener('change', function () {
+                // Actualiza el valor del input hidden con el valor seleccionado del select
+                let selectedIndex = this.selectedIndex;
+                let selectedText = this.options[selectedIndex].text;
+                let selectedValue = this.value;
+
+                if (selectedText == "Selecciona por favor") {
+                    input_tfa734.value = "";
+                } else {
+                    input_tfa734.value = selectedValue;
+
+                    //focusInOut(input_tfa734, input_tfa734_d);
+                    let tfa734_div = document.querySelector('#tfa_734-D > .inputWrapper');
+                    tfa734_div.style.display = 'block';
+                    input_tfa734.focus();
+                    input_tfa734.blur();
+                    tfa734_div.style.display = 'none';
+                }
+            });
+        }
+
+        /******* FIN UNIVERSIDAD ENFERMERIA - INPUT TFA734 *******/
+
+        /******* EXIGENCIA CAMPO PRACTICO - INPUT TFA829 *******/
+
+        const input_tfa829 = document.getElementById("tfa_829");
+        const input_tfa829_d = document.getElementById("tfa_829-D");
+
+        let urlWsExigenciaCampoPractico = webservice + "?ws_name=exigenciaCampoPractico&ipo=" + input_tfa701.value;
+
+        fetch(urlWsExigenciaCampoPractico, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        })
+            .then(response => response.json())
+            .then(data => {
+                // Agrega las opciones al select
+                exigenciaCampoPractico = data;
+                input_tfa829.value = data;
+
+                focusInOut(input_tfa829, input_tfa829_d);
+
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+
+        /******* FIN EXIGENCIA CAMPO PRACTICO - INPUT TFA829 *******/
+
+        /******* EXIGENCIA SEDE REFERENCIA - INPUT TFA831 *******/
+
+        const input_tfa831 = document.getElementById("tfa_831");
+        const input_tfa831_d = document.getElementById("tfa_831-D");
+
+        let urlWsExigenciaSedeReferencia = webservice + "?ws_name=sedeReferenciaFunction&ipo=" + input_tfa701.value;
+
+        fetch(urlWsExigenciaSedeReferencia, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        })
+            .then(response => response.json())
+            .then(data => {
+                // Agrega las opciones al select
+                exigenciaSedePreferencia = data;
+                input_tfa831.value = data;
+
+                focusInOut(input_tfa831, input_tfa831_d);
+
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+
+        /******* FIN EXIGENCIA SEDE REFERENCIA - INPUT TFA831 *******/
+
+        /******* EXIGENCIA TURNO CURSADA - INPUT TFA833 *******/
+
+        const input_tfa833 = document.getElementById("tfa_833");
+        const input_tfa833_d = document.getElementById("tfa_833-D");
+
+        let urlWsExigenciaTurnoCursada = webservice + "?ws_name=turnoCursada&ipo=" + input_tfa701.value;
+
+        fetch(urlWsExigenciaTurnoCursada, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        })
+            .then(response => response.json())
+            .then(data => {
+                input_tfa833.value = data;
+
+                focusInOut(input_tfa833, input_tfa833_d);
+
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+
+        /******* FIN EXIGENCIA TURNO CURSADA - INPUT TFA833 *******/
+
+
+        /******* SEXO - INPUT TFA623 *******/
+
+        const input_tfa623 = document.getElementById("tfa_623");
+        const input_tfa623_d = document.getElementById("tfa_623-D");
+        const select_tfa623 = document.createElement('select');
+
+        if (input_tfa623.value == "") {
+            select_tfa623.className = "required";
+
+            let firstOption_tfa623 = document.createElement('option');
+            firstOption_tfa623.textContent = "Selecciona por favor";
+            select_tfa623.appendChild(firstOption_tfa623);
+
+            let urlWsSexo = webservice + "?ws_name=sexo";
+
+            fetch(urlWsSexo, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            })
+                .then(response => response.json())
+                .then(data => {
+                    // Agrega las opciones al select
+                    data.forEach(function (d) {
+                        let option = document.createElement('option');
+                        option.textContent = d["D_SEXO"];
+                        option.value = d["C_SEXO"];
+                        select_tfa623.appendChild(option);
+                    });
+
+                    contenedorSelect("Sexo", select_tfa623, input_tfa623_d);
+
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+
+            // Escucha el evento change en el select
+            select_tfa623.addEventListener('change', function () {
+                // Actualiza el valor del input hidden con el valor seleccionado del select
+                let selectedIndex = this.selectedIndex;
+                let selectedText = this.options[selectedIndex].text;
+                let selectedValue = this.value;
+
+                if (selectedText == "Selecciona por favor") {
+                    input_tfa623.value = "";
+                } else {
+                    input_tfa623.value = selectedValue;
+                }
+            });
+        }
+
+        /******* FIN SEXO - INPUT TFA623 *******/
+
+
+        /******* GÉNERO - INPUT TFA16 *******/
+
+        const input_tfa16 = document.getElementById("tfa_16");
+        const input_tfa16_d = document.getElementById("tfa_16-D");
+        const select_tfa16 = document.createElement('select');
+
+        if (input_tfa16.value == "") {
+            select_tfa16.className = "required";
+
+            let firstOption_tfa16 = document.createElement('option');
+            firstOption_tfa16.textContent = "Selecciona por favor";
+            select_tfa16.appendChild(firstOption_tfa16);
+
+            let urlWsGenero = webservice + "?ws_name=generos";
+
+            fetch(urlWsGenero, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            })
+                .then(response => response.json())
+                .then(data => {
+                    // Agrega las opciones al select
+                    data.forEach(function (d) {
+                        let option = document.createElement('option');
+                        option.textContent = d["D_GENERO"];
+                        option.value = d["C_GENERO"];
+                        select_tfa16.appendChild(option);
+                    });
+
+                    contenedorSelect("Género", select_tfa16, input_tfa16_d);
+
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+
+            // Escucha el evento change en el select
+            select_tfa16.addEventListener('change', function () {
+                // Actualiza el valor del input hidden con el valor seleccionado del select
+                let selectedIndex = this.selectedIndex;
+                let selectedText = this.options[selectedIndex].text;
+                let selectedValue = this.value;
+
+                if (selectedText == "Selecciona por favor") {
+                    input_tfa16.value = "";
+                } else {
+                    input_tfa16.value = selectedValue;
+
+                    focusInOut(input_tfa16, input_tfa16_d);
+                }
+            });
+        }
+
+        /******* FIN GÉNERO - INPUT TFA16 *******/
+
+
+        /******* ESTADO CIVIL - INPUT TFA342 *******/
+
+        const input_tfa342 = document.getElementById("tfa_342");
+        const input_tfa342_d = document.getElementById("tfa_342-D");
+        const select_tfa342 = document.createElement('select');
+
+        if (input_tfa342.value == "") {
+            select_tfa342.className = "required";
+
+            let firstOption_tfa342 = document.createElement('option');
+            firstOption_tfa342.textContent = "Selecciona por favor";
+            select_tfa342.appendChild(firstOption_tfa342);
+
+            let urlWsEstCivil = webservice + "?ws_name=estadoCivil";
+
+            fetch(urlWsEstCivil, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            })
+                .then(response => response.json())
+                .then(data => {
+                    // Agrega las opciones al select
+                    data.forEach(function (d) {
+                        let option = document.createElement('option');
+                        option.textContent = d["D_ESTADO_CIVIL"];
+                        option.value = d["C_ESTADO_CIVIL"];
+                        select_tfa342.appendChild(option);
+                    });
+
+                    contenedorSelect("Estado Civil", select_tfa342, input_tfa342_d);
+
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+
+            // Escucha el evento change en el select
+            select_tfa342.addEventListener('change', function () {
+                // Actualiza el valor del input hidden con el valor seleccionado del select
+                let selectedIndex = this.selectedIndex;
+                let selectedText = this.options[selectedIndex].text;
+                let selectedValue = this.value;
+
+                if (selectedText == "Selecciona por favor") {
+                    input_tfa342.value = "";
+                } else {
+                    input_tfa342.value = selectedValue;
+                }
+            });
+        }
+
+        /******* FIN ESTADO CIVIL - INPUT TFA342 *******/
+
+
+        /******* NACIONALIDAD - INPUT TFA67 *******/
+
+        const input_tfa67 = document.getElementById("tfa_67");
+        const input_tfa67_d = document.getElementById("tfa_67-D");
+        const select_tfa67 = document.createElement('select');
+
+        if (input_tfa67.value == "") {
+            select_tfa67.className = "required";
+
+            let firstOption_tfa67 = document.createElement('option');
+            firstOption_tfa67.textContent = "Selecciona por favor";
+            select_tfa67.appendChild(firstOption_tfa67);
+
+            let urlWsNacionalidad = webservice + "?ws_name=nacionalidades";
+
+            fetch(urlWsNacionalidad, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            })
+                .then(response => response.json())
+                .then(data => {
+                    // Agrega las opciones al select
+                    data.forEach(function (d) {
+                        let option = document.createElement('option');
+                        option.textContent = d["D_NACIONALIDAD"];
+                        option.value = d["C_NACIONALIDAD"];
+                        select_tfa67.appendChild(option);
+                    });
+
+                    contenedorSelect("Nacionalidad", select_tfa67, input_tfa67_d);
+
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+
+            // Escucha el evento change en el select
+            select_tfa67.addEventListener('change', function () {
+                // Actualiza el valor del input hidden con el valor seleccionado del select
+                let selectedIndex = this.selectedIndex;
+                let selectedText = this.options[selectedIndex].text;
+                let selectedValue = this.value;
+
+                if (selectedText == "Selecciona por favor") {
+                    input_tfa67.value = "";
+                } else {
+                    input_tfa67.value = selectedValue;
+                }
+            });
+        }
+
+        /******* FIN NACIONALIDAD - INPUT TFA67 *******/
+
+        /******* SEDE REFERENCIA EXAMENES - INPUT TFA332 *******/
+
+        const input_tfa332 = document.getElementById("tfa_332");
+        const input_tfa332_d = document.getElementById("tfa_332-D");
+        const select_tfa332 = document.createElement('select');
+
+
+
+        select_tfa332.className = "required";
+
+        let firstOption_tfa332 = document.createElement('option');
+        firstOption_tfa332.textContent = "Selecciona por favor";
+        select_tfa332.appendChild(firstOption_tfa332);
+
+        let urlWsSedeReferenciaCombo = webservice + "?ws_name=sedeReferenciaCombo";
+
+        fetch(urlWsSedeReferenciaCombo, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        })
+            .then(response => response.json())
+            .then(data => {
+                // Agrega las opciones al select
+                data.forEach(function (d) {
+                    let option = document.createElement('option');
+                    option.textContent = d["D_DATO"];
+                    option.value = d["C_DATO"];
+                    select_tfa332.appendChild(option);
+                });
+
+                contenedorSelect("Sede de preferencia para rendir los exámenes", select_tfa332, input_tfa332_d, input_tfa332_d.id);
+
+                const input_tfa332_fa = document.getElementById("tfa_332-D-fa");
+
+                input_tfa332_d.appendChild(input_tfa332_fa);
+
+
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+
+        // Escucha el evento change en el select
+        select_tfa332.addEventListener('change', function () {
+            // Actualiza el valor del input hidden con el valor seleccionado del select
+            let selectedIndex = this.selectedIndex;
+            let selectedText = this.options[selectedIndex].text;
+            let selectedValue = this.value;
+
+            if (selectedText == "Selecciona por favor") {
+                input_tfa332.value = "";
+            } else {
+                input_tfa332.value = selectedValue;
+            }
+        });
+
+        /******* FIN SEDE REFERENCIA EXAMENES - INPUT TFA332 *******/
+
+
+        /******* CAMPO PRACTICO - INPUT TFA519 *******/
+
+        const input_tfa519 = document.getElementById("tfa_519");
+        const input_tfa519_d = document.getElementById("tfa_519-D");
+        const select_tfa519 = document.createElement('select');
+
+
+
+
+        select_tfa519.className = "required";
+
+        let firstOption_tfa519 = document.createElement('option');
+        firstOption_tfa519.textContent = "Selecciona por favor";
+        select_tfa519.appendChild(firstOption_tfa519);
+
+        let urlWsCampoPracticoCombo = webservice + "?ws_name=campoPracticoCombo";
+
+        fetch(urlWsCampoPracticoCombo, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        })
+            .then(response => response.json())
+            .then(data => {
+                // Agrega las opciones al select
+                data.forEach(function (d) {
+                    let option = document.createElement('option');
+                    option.textContent = d["D_DESCRED"];
+                    option.value = d["N_ID_ESPACIO"];
+                    select_tfa519.appendChild(option);
+                });
+
+
+                contenedorSelect("¿En cuál de los siguientes ámbitos realizarás la cursada de tus prácticas integradas supervisadas? Las asignaturas con carga horaria teórica se cursan enteramente en modalidad a distancia y las prácticas requieren de tu asistencia presencial diaria obligatoria en los ámbitos detallados durante todo el desarrollo.", select_tfa519, input_tfa519_d, input_tfa519_d.id);
+
+                const input_tfa519_fa = document.getElementById("tfa_519-D-fa");
+
+                input_tfa519_d.appendChild(input_tfa519_fa);
+
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+
+        // Escucha el evento change en el select
+        select_tfa519.addEventListener('change', function () {
+            // Actualiza el valor del input hidden con el valor seleccionado del select
+            let selectedIndex = this.selectedIndex;
+            let selectedText = this.options[selectedIndex].text;
+            let selectedValue = this.value;
+
+            if (selectedText == "Selecciona por favor") {
+                input_tfa519.value = "";
+            } else {
+                input_tfa519.value = selectedValue;
+            }
+        });
+
+
+        /******* FIN CAMPO PRACTICO - INPUT TFA519 *******/
+
+
+        /*-------------- PREFERENCIA DE TURNOS --------------*/
+        /******* PREFERENCIA DE TURNO 1  - INPUT TFA823 *******/
+
+        const input_tfa823 = document.getElementById("tfa_823");
+        const input_tfa823_d = document.getElementById("tfa_823-D");
+        const select_tfa823 = document.createElement('select');
+
+        if (input_tfa823.value == "") {
+            select_tfa823.className = "required";
+
+            let firstOption_tfa823 = document.createElement('option');
+            firstOption_tfa823.textContent = "Selecciona por favor";
+            select_tfa823.appendChild(firstOption_tfa823);
+
+            let urlWsTurnosCurso = webservice + "?ws_name=turnosCurso";
+
+            fetch(urlWsTurnosCurso, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            })
+                .then(response => response.json())
+                .then(data => {
+                    // Agrega las opciones al select
+                    data.forEach(function (d) {
+                        let option = document.createElement('option');
+                        option.textContent = d["D_DATO"];
+                        option.value = d["C_DATO"];
+                        select_tfa823.appendChild(option);
+                    });
+
+                    contenedorSelect("Preferencia de turno 1", select_tfa823, input_tfa823_d);
+
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+
+            // Escucha el evento change en el select
+            select_tfa823.addEventListener('change', function () {
+                // Actualiza el valor del input hidden con el valor seleccionado del select
+                let selectedIndex = this.selectedIndex;
+                let selectedText = this.options[selectedIndex].text;
+                let selectedValue = this.value;
+
+                if (selectedText == "Selecciona por favor") {
+                    input_tfa823.value = "";
+                } else {
+                    input_tfa823.value = selectedValue;
+                }
+            });
+        }
+
+        /******* FIN PREFERENCIA DE TURNO 1 - INPUT TFA823 *******/
+
+        /******* PREFERENCIA DE TURNO 2 - INPUT TFA825 *******/
+
+        const input_tfa825 = document.getElementById("tfa_825");
+        const input_tfa825_d = document.getElementById("tfa_825-D");
+        const select_tfa825 = document.createElement('select');
+
+        if (input_tfa825.value == "") {
+            select_tfa825.className = "required";
+
+            let firstOption_tfa825 = document.createElement('option');
+            firstOption_tfa825.textContent = "Selecciona por favor";
+            firstOption_tfa825.value = '';
+            firstOption_tfa825.disabled = true;
+            firstOption_tfa825.selected = true;
+            select_tfa825.appendChild(firstOption_tfa825);
+
+            contenedorSelect("Segunda preferencia de turno", select_tfa825, input_tfa825_d);
+
+            select_tfa823.addEventListener("change", function () {
+
+                // Restablesco inputs ocultos
+                input_tfa825.value = "";
+                input_tfa827.value = "";
+                select_tfa827.innerHTML = "";
+                let firstOption_tfa827 = document.createElement('option');
+                firstOption_tfa827.textContent = "Selecciona por favor";
+                firstOption_tfa827.value = '';
+                firstOption_tfa827.disabled = true;
+                firstOption_tfa827.selected = true;
+                select_tfa827.appendChild(firstOption_tfa827);
+
+                // Opción seleccionada 
+                select_tfa823_option = this.options[select_tfa823.selectedIndex];
+
+                let urlWsTurnosCurso = webservice + "?ws_name=turnosCurso&ipo=" + input_tfa701.value + "&sede=&calendario=1&seleccionPrevia=" + select_tfa823_option.value;
+
+                fetch(urlWsTurnosCurso, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                })
+                    .then(response => response.json())
+                    .then(data => {
+
+                        select_tfa825.innerHTML = "";
+
+                        let firstOption_tfa825 = document.createElement('option');
+                        firstOption_tfa825.textContent = "Selecciona por favor";
+                        firstOption_tfa825.value = '';
+                        firstOption_tfa825.disabled = true;
+                        firstOption_tfa825.selected = true;
+                        select_tfa825.appendChild(firstOption_tfa825);
+
+                        // Agrega las opciones al select
+                        data.forEach(function (d) {
+                            let option = document.createElement('option');
+                            option.textContent = d["D_DATO"];
+                            option.value = d["C_DATO"];
+                            //option.classList.add(d["C_DATO"]);
+                            select_tfa825.appendChild(option);
+                        });
+
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+            })
+
+            // Escucha el evento change en el select
+            select_tfa825.addEventListener('change', function () {
+                // Actualiza el valor del input hidden con el valor seleccionado del select
+                let selectedIndex = this.selectedIndex;
+                let selectedText = this.options[selectedIndex].text;
+                let selectedValue = this.value;
+                //let selectIdSaleforce = this.options[selectedIndex].className;
+
+                input_tfa825.value = selectedValue;
+            });
+        }
+
+        /******* FIN PREFERENCIA DE TURNO 2 - INPUT TFA825 *******/
+
+        /******* FIN PREFERENCIA DE TURNO 3 - INPUT TFA827 *******/
+
+        const input_tfa827 = document.getElementById("tfa_827");
+        const input_tfa827_d = document.getElementById("tfa_827-D");
+        const select_tfa827 = document.createElement('select');
+
+        if (input_tfa827.value == "") {
+            select_tfa827.className = "required";
+
+            let firstOption_tfa827 = document.createElement('option');
+            firstOption_tfa827.textContent = "Selecciona por favor";
+            firstOption_tfa827.value = '';
+            firstOption_tfa827.disabled = true;
+            firstOption_tfa827.selected = true;
+            select_tfa827.appendChild(firstOption_tfa827);
+
+            contenedorSelect("Tercera preferencia de turno", select_tfa827, input_tfa827_d);
+
+            select_tfa825.addEventListener("change", function () {
+                input_tfa827.value = "";
+
+                // Opción seleccionada
+                select_tfa823_option = select_tfa823.options[select_tfa823.selectedIndex];
+                select_tfa825_option = this.options[select_tfa825.selectedIndex];
+
+                urlWsTurnosCurso = webservice + "?ws_name=turnosCurso&ipo=" + input_tfa701.value + "&sede=&calendario=1&seleccionPrevia=" + select_tfa823_option.value + "," + select_tfa825_option.value;
+
+                fetch(urlWsTurnosCurso, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                })
+                    .then(response => response.json())
+                    .then(data => {
+
+                        select_tfa827.innerHTML = "";
+
+                        let firstOption_tfa827 = document.createElement('option');
+                        firstOption_tfa827.textContent = "Selecciona por favor";
+                        firstOption_tfa827.value = '';
+                        firstOption_tfa827.disabled = true;
+                        firstOption_tfa827.selected = true;
+                        select_tfa827.appendChild(firstOption_tfa827);
+
+                        // Agrega las opciones al select
+                        data.forEach(function (d) {
+                            let option = document.createElement('option');
+                            option.textContent = d["D_DATO"];
+                            option.value = d["C_DATO"];
+                            //option.classList.add(d["C_DATO"]);
+                            select_tfa827.appendChild(option);
+                        });
+
+                        //contenedorSelect("Provincia", select_tfa827, input_tfa827_d);
+
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+            })
+
+            // Escucha el evento change en el select
+            select_tfa827.addEventListener('change', function () {
+                // Actualiza el valor del input hidden con el valor seleccionado del select
+                let selectedIndex = this.selectedIndex;
+                let selectedText = this.options[selectedIndex].text;
+                let selectedValue = this.value;
+                //let selectIdSaleforce = this.options[selectedIndex].className;
+
+                input_tfa827.value = selectedValue;
+            });
+        }
+
+        /******* FIN FIN PREFERENCIA DE TURNO 3 - INPUT TFA827 *******/
+
+        /*-------------- FIN PREFERENCIA DE TURNOS --------------*/
+
+        /*-------------- INFORMACIÓN PERSONAL --------------*/
+        /******* PAÍS - INPUT TFA170 *******/
+
+        const input_tfa170 = document.getElementById("tfa_170");
+        const input_tfa170_d = document.getElementById("tfa_170-D");
+        const select_tfa170 = document.createElement('select');
+        let urlWsPaises = webservice + "?ws_name=paises";
+
+        if (input_tfa170.value == "") {
+            select_tfa170.className = "required";
+
+            let firstOption_tfa170 = document.createElement('option');
+            firstOption_tfa170.textContent = "Selecciona por favor";
+            select_tfa170.appendChild(firstOption_tfa170);
+
+            fetch(urlWsPaises, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            })
+                .then(response => response.json())
+                .then(data => {
+                    // Agrega las opciones al select
+                    data.forEach(function (d) {
+                        let option = document.createElement('option');
+                        option.textContent = d["D_PAIS"];
+                        option.value = d["N_ID_PAIS"];
+                        option.classList.add(d["SF_ID_PAIS"]);
+                        select_tfa170.appendChild(option);
+                    });
+
+                    contenedorSelect("País de nacimiento", select_tfa170, input_tfa170_d);
+
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+
+            // Escucha el evento change en el select
+            select_tfa170.addEventListener('change', function () {
+                // Actualiza el valor del input hidden con el valor seleccionado del select
+                let selectedIndex = this.selectedIndex;
+                let selectedText = this.options[selectedIndex].text;
+                let selectedValue = this.value;
+                let selectIdSaleforce = this.options[selectedIndex].className;
+
+                if (selectedText == "Selecciona por favor") {
+                    input_tfa170.value = "";
+                } else {
+                    input_tfa170.value = selectIdSaleforce;
+                }
+            });
+        }
+
+        /******* FIN PAÍS - INPUT TFA170 *******/
+
+
+        /******* PROVINCIA - INPUT TFA177 *******/
+
+        const input_tfa177 = document.getElementById("tfa_177");
+        const input_tfa177_d = document.getElementById("tfa_177-D");
+        const select_tfa177 = document.createElement('select');
+
+        if (input_tfa177.value == "") {
+            select_tfa177.className = "required";
+
+            let firstOption_tfa177 = document.createElement('option');
+            firstOption_tfa177.textContent = "Selecciona por favor";
+            firstOption_tfa177.value = '';
+            firstOption_tfa177.disabled = true;
+            firstOption_tfa177.selected = true;
+            select_tfa177.appendChild(firstOption_tfa177);
+
+            contenedorSelect("Provincia de nacimiento", select_tfa177, input_tfa177_d);
+
+            select_tfa170.addEventListener("change", function () {
+
+                // Restablesco inputs ocultos
+                input_tfa177.value = "";
+                input_tfa46.value = "";
+                select_tfa46.innerHTML = "";
+                let firstOption_tfa46 = document.createElement('option');
+                firstOption_tfa46.textContent = "Selecciona por favor";
+                firstOption_tfa46.value = '';
+                firstOption_tfa46.disabled = true;
+                firstOption_tfa46.selected = true;
+                select_tfa46.appendChild(firstOption_tfa46);
+
+                // Opción seleccionada en país
+                select_tfa170_option = this.options[select_tfa170.selectedIndex];
+
+                let urlWsProvincias = webservice + "?ws_name=provincias&pais=" + select_tfa170_option.value;
+
+                fetch(urlWsProvincias, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                })
+                    .then(response => response.json())
+                    .then(data => {
+
+                        select_tfa177.innerHTML = "";
+
+                        let firstOption_tfa177 = document.createElement('option');
+                        firstOption_tfa177.textContent = "Selecciona por favor";
+                        firstOption_tfa177.value = '';
+                        firstOption_tfa177.disabled = true;
+                        firstOption_tfa177.selected = true;
+                        select_tfa177.appendChild(firstOption_tfa177);
+
+                        // Agrega las opciones al select
+                        data.forEach(function (d) {
+                            let option = document.createElement('option');
+                            option.textContent = d["D_PROVINCIA"];
+                            option.value = d["N_ID_PROVINCIA"];
+                            option.classList.add(d["SF_ID_PROVINCIA"]);
+                            select_tfa177.appendChild(option);
+                        });
+
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+            })
+
+            // Escucha el evento change en el select
+            select_tfa177.addEventListener('change', function () {
+                // Actualiza el valor del input hidden con el valor seleccionado del select
+                let selectedIndex = this.selectedIndex;
+                let selectedText = this.options[selectedIndex].text;
+                let selectedValue = this.value;
+                let selectIdSaleforce = this.options[selectedIndex].className;
+
+                input_tfa177.value = selectIdSaleforce;
+            });
+        }
+
+        /******* FIN PROVINCIA - INPUT TFA177 *******/
+
+
+        /******* LOCALIDAD - INPUT TFA46 *******/
+
+        const input_tfa46 = document.getElementById("tfa_46");
+        const input_tfa46_d = document.getElementById("tfa_46-D");
+        const select_tfa46 = document.createElement('select');
+
+        if (input_tfa46.value == "") {
+            select_tfa46.className = "required";
+
+            let firstOption_tfa46 = document.createElement('option');
+            firstOption_tfa46.textContent = "Selecciona por favor";
+            firstOption_tfa46.value = '';
+            firstOption_tfa46.disabled = true;
+            firstOption_tfa46.selected = true;
+            select_tfa46.appendChild(firstOption_tfa46);
+
+            contenedorSelect("Localidad de nacimiento", select_tfa46, input_tfa46_d);
+
+            select_tfa177.addEventListener("change", function () {
+                input_tfa46.value = "";
+
+                // Opción seleccionada en país
+                select_tfa170_option = select_tfa170.options[select_tfa170.selectedIndex];
+                select_tfa177_option = this.options[select_tfa177.selectedIndex];
+
+                let urlWsLocalidades = webservice + "?ws_name=localidades&pais=" + select_tfa170_option.value + "&provincia=" +
+                    select_tfa177_option.value;
+
+                fetch(urlWsLocalidades, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                })
+                    .then(response => response.json())
+                    .then(data => {
+
+                        select_tfa46.innerHTML = "";
+
+                        let firstOption_tfa46 = document.createElement('option');
+                        firstOption_tfa46.textContent = "Selecciona por favor";
+                        firstOption_tfa46.value = '';
+                        firstOption_tfa46.disabled = true;
+                        firstOption_tfa46.selected = true;
+                        select_tfa46.appendChild(firstOption_tfa46);
+
+                        // Agrega las opciones al select
+                        data.forEach(function (d) {
+                            let option = document.createElement('option');
+                            option.textContent = d["D_LOCALIDAD"];
+                            option.value = d["N_ID_LOCALIDAD"];
+                            option.classList.add(d["SF_ID_LOCALIDAD"]);
+                            select_tfa46.appendChild(option);
+                        });
+
+                        //contenedorSelect("Provincia", select_tfa46, input_tfa46_d);
+
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+            })
+
+            // Escucha el evento change en el select
+            select_tfa46.addEventListener('change', function () {
+                // Actualiza el valor del input hidden con el valor seleccionado del select
+                let selectedIndex = this.selectedIndex;
+                let selectedText = this.options[selectedIndex].text;
+                let selectedValue = this.value;
+                let selectIdSaleforce = this.options[selectedIndex].className;
+
+                input_tfa46.value = selectIdSaleforce;
+            });
+        }
+
+        /******* FIN LOCALIDAD - INPUT TFA46 *******/
+        /*-------------- FIN INFORMACIÓN PERSONAL --------------*/
+
+
+        /*-------------- DOMICILIO PARTICULAR --------------*/
+        /******* PAÍS - INPUT TFA166 *******/
+
+        const input_tfa166 = document.getElementById("tfa_166");
+        const input_tfa166_d = document.getElementById("tfa_166-D");
+        const select_tfa166 = document.createElement('select');
+
+        if (input_tfa166.value == "") {
+            select_tfa166.className = "required";
+
+            let firstOption_tfa166 = document.createElement('option');
+            firstOption_tfa166.textContent = "Selecciona por favor";
+            select_tfa166.appendChild(firstOption_tfa166);
+
+            fetch(urlWsPaises, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            })
+                .then(response => response.json())
+                .then(data => {
+                    // Agrega las opciones al select
+                    data.forEach(function (d) {
+                        let option = document.createElement('option');
+                        option.textContent = d["D_PAIS"];
+                        option.value = d["N_ID_PAIS"];
+                        option.classList.add(d["SF_ID_PAIS"]);
+                        select_tfa166.appendChild(option);
+                    });
+
+                    contenedorSelect("País", select_tfa166, input_tfa166_d);
+
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+
+            // Escucha el evento change en el select
+            select_tfa166.addEventListener('change', function () {
+                // Actualiza el valor del input hidden con el valor seleccionado del select
+                let selectedIndex = this.selectedIndex;
+                let selectedText = this.options[selectedIndex].text;
+                let selectedValue = this.value;
+                let selectIdSaleforce = this.options[selectedIndex].className;
+
+                if (selectedText == "Selecciona por favor") {
+                    input_tfa166.value = "";
+                } else {
+                    input_tfa166.value = selectIdSaleforce;
+                }
+            });
+        }
+
+        /******* FIN PAÍS - INPUT TFA166 *******/
+
+
+        /******* PROVINCIA - INPUT TFA174 *******/
+
+        const input_tfa174 = document.getElementById("tfa_174");
+        const input_tfa174_d = document.getElementById("tfa_174-D");
+        const select_tfa174 = document.createElement('select');
+
+        if (input_tfa174.value == "") {
+            select_tfa174.className = "required";
+
+            let firstOption_tfa174 = document.createElement('option');
+            firstOption_tfa174.textContent = "Selecciona por favor";
+            firstOption_tfa174.value = '';
+            firstOption_tfa174.disabled = true;
+            firstOption_tfa174.selected = true;
+            select_tfa174.appendChild(firstOption_tfa174);
+
+
+            contenedorSelect("Provincia", select_tfa174, input_tfa174_d);
+
+            select_tfa166.addEventListener("change", function () {
+
+                // Restablesco inputs ocultos
+                input_tfa174.value = "";
+                input_tfa43.value = "";
+                select_tfa43.innerHTML = "";
+                let firstOption_tfa43 = document.createElement('option');
+                firstOption_tfa43.textContent = "Selecciona por favor";
+                firstOption_tfa43.value = '';
+                firstOption_tfa43.disabled = true;
+                firstOption_tfa43.selected = true;
+                select_tfa43.appendChild(firstOption_tfa43);
+
+                // Opción seleccionada en país
+                select_tfa166_option = this.options[select_tfa166.selectedIndex];
+
+                let urlWsProvincias = webservice + "?ws_name=provincias&pais=" + select_tfa166_option.value;
+
+                fetch(urlWsProvincias, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                })
+                    .then(response => response.json())
+                    .then(data => {
+
+                        select_tfa174.innerHTML = "";
+
+                        let firstOption_tfa174 = document.createElement('option');
+                        firstOption_tfa174.textContent = "Selecciona por favor";
+                        firstOption_tfa174.value = '';
+                        firstOption_tfa174.disabled = true;
+                        firstOption_tfa174.selected = true;
+                        select_tfa174.appendChild(firstOption_tfa174);
+
+                        // Agrega las opciones al select
+                        data.forEach(function (d) {
+                            let option = document.createElement('option');
+                            option.textContent = d["D_PROVINCIA"];
+                            option.value = d["N_ID_PROVINCIA"];
+                            option.classList.add(d["SF_ID_PROVINCIA"]);
+                            select_tfa174.appendChild(option);
+                        });
+
+                        //contenedorSelect("Provincia", select_tfa174, input_tfa174_d);
+
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+            })
+
+            // Escucha el evento change en el select
+            select_tfa174.addEventListener('change', function () {
+                // Actualiza el valor del input hidden con el valor seleccionado del select
+                let selectedIndex = this.selectedIndex;
+                let selectedText = this.options[selectedIndex].text;
+                let selectedValue = this.value;
+                let selectIdSaleforce = this.options[selectedIndex].className;
+
+                input_tfa174.value = selectIdSaleforce;
+            });
+        }
+
+        /******* FIN PROVINCIA - INPUT TFA174 *******/
+
+
+        /******* LOCALIDAD - INPUT TFA43 *******/
+
+        const input_tfa43 = document.getElementById("tfa_43");
+        const input_tfa43_d = document.getElementById("tfa_43-D");
+        const select_tfa43 = document.createElement('select');
+
+        if (input_tfa43.value == "") {
+            select_tfa43.className = "required";
+
+            let firstOption_tfa43 = document.createElement('option');
+            firstOption_tfa43.textContent = "Selecciona por favor";
+            firstOption_tfa43.value = '';
+            firstOption_tfa43.disabled = true;
+            firstOption_tfa43.selected = true;
+            select_tfa43.appendChild(firstOption_tfa43);
+
+            contenedorSelect("Localidad", select_tfa43, input_tfa43_d);
+
+            select_tfa174.addEventListener("change", function () {
+                input_tfa43.value = "";
+
+                // Opción seleccionada en país
+                select_tfa166_option = select_tfa166.options[select_tfa166.selectedIndex];
+                select_tfa174_option = this.options[select_tfa174.selectedIndex];
+
+                let urlWsLocalidades = webservice + "?ws_name=localidades&pais=" + select_tfa166_option.value + "&provincia=" +
+                    select_tfa174_option.value;
+
+                fetch(urlWsLocalidades, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                })
+                    .then(response => response.json())
+                    .then(data => {
+
+                        select_tfa43.innerHTML = "";
+
+                        let firstOption_tfa43 = document.createElement('option');
+                        firstOption_tfa43.textContent = "Selecciona por favor";
+                        firstOption_tfa43.value = '';
+                        firstOption_tfa43.disabled = true;
+                        firstOption_tfa43.selected = true;
+                        select_tfa43.appendChild(firstOption_tfa43);
+
+                        // Agrega las opciones al select
+                        data.forEach(function (d) {
+                            let option = document.createElement('option');
+                            option.textContent = d["D_LOCALIDAD"];
+                            option.value = d["N_ID_LOCALIDAD"];
+                            option.classList.add(d["SF_ID_LOCALIDAD"]);
+                            select_tfa43.appendChild(option);
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+            })
+
+            // Escucha el evento change en el select
+            select_tfa43.addEventListener('change', function () {
+                // Actualiza el valor del input hidden con el valor seleccionado del select
+                let selectedIndex = this.selectedIndex;
+                let selectedText = this.options[selectedIndex].text;
+                let selectedValue = this.value;
+                let selectIdSaleforce = this.options[selectedIndex].className;
+
+                input_tfa43.value = selectIdSaleforce;
+            });
+        }
+
+        /******* FIN LOCALIDAD - INPUT TFA43 *******/
+        /*-------------- FIN DOMICILIO PARTICULAR --------------*/
+
+
+        /******* COBERTURA MEDICA - INPUT TFA200 *******/
+
+        const input_tfa200 = document.getElementById("tfa_200");
+        const input_tfa200_d = document.getElementById("tfa_200-D");
+        const select_tfa200 = document.createElement('select');
+        let urlWsCobertura = webservice + "?ws_name=coberturaMedica";
+
+        if (input_tfa200.value == "") {
+            select_tfa200.className = "required";
+
+            let firstOption_tfa200 = document.createElement('option');
+            firstOption_tfa200.textContent = "Selecciona por favor";
+            select_tfa200.appendChild(firstOption_tfa200);
+
+            fetch(urlWsCobertura, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            })
+                .then(response => response.json())
+                .then(data => {
+
+                    // Agrega las opciones al select
+                    data.forEach(function (d) {
+                        let option = document.createElement('option');
+                        option.textContent = d["D_COBERTURA_MEDICA"];
+                        option.value = d["C_COBERTURA_MEDICA"];
+                        select_tfa200.appendChild(option);
+                    });
+
+                    contenedorSelect("Cobertura", select_tfa200, input_tfa200_d);
+
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+
+            // Escucha el evento change en el select
+            select_tfa200.addEventListener('change', function () {
+                // Actualiza el valor del input hidden con el valor seleccionado del select
+                let selectedIndex = this.selectedIndex;
+                let selectedText = this.options[selectedIndex].text;
+                let selectedValue = this.value;
+
+                if (selectedText == "Selecciona por favor") {
+                    input_tfa200.value = "";
+                } else {
+                    input_tfa200.value = selectedValue;
+
+                    focusInOut(input_tfa200, input_tfa200_d);
+                }
+            });
+        }
+
+        /******* FIN COBERTURA MEDICA - INPUT TFA200 *******/
+
+
+        /*-------------- ANTECEDENTES ACADÉMICOS --------------*/
+
+        /******* COLEGIO - INPUT TFA9 *******/
+
+        const input_tfa9 = document.getElementById("tfa_9");
+        const input_tfa9_d = document.getElementById("tfa_9-D");
+        const select_tfa9 = document.createElement('select');
+        let urlWsSecundarios = webservice + "?ws_name=secundarios";
+
+        if (input_tfa9.value == "") {
+            select_tfa9.className = "required";
+
+            let firstOption_tfa9 = document.createElement('option');
+            firstOption_tfa9.textContent = "Selecciona por favor";
+            select_tfa9.appendChild(firstOption_tfa9);
+
+            fetch(urlWsSecundarios, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            })
+                .then(response => response.json())
+                .then(data => {
+
+                    // Agrega las opciones al select
+                    data.forEach(function (d) {
+                        let option = document.createElement('option');
+                        option.textContent = d["D_SECUNDARIO"];
+                        option.value = d["SF_ID_SECUNDARIO"];
+                        select_tfa9.appendChild(option);
+                    });
+
+                    contenedorSelect("Colegio", select_tfa9, input_tfa9_d);
+
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+
+            // Escucha el evento change en el select
+            select_tfa9.addEventListener('change', function () {
+                // Actualiza el valor del input hidden con el valor seleccionado del select
+                let selectedIndex = this.selectedIndex;
+                let selectedText = this.options[selectedIndex].text;
+                let selectedValue = this.value;
+
+                if (selectedText == "Selecciona por favor") {
+                    input_tfa9.value = "";
+                } else {
+                    input_tfa9.value = selectedValue;
+
+                    focusInOut(input_tfa9, input_tfa9_d);
+                }
+            });
+        }
+
+        /******* FIN COLEGIO - INPUT TFA9 *******/
+
+
+        /******* PAÍS - INPUT TFA169 *******/
+
+        const input_tfa169 = document.getElementById("tfa_169");
+        const input_tfa169_d = document.getElementById("tfa_169-D");
+        const select_tfa169 = document.createElement('select');
+
+        if (input_tfa169.value == "") {
+            select_tfa169.className = "required";
+
+            let firstOption_tfa169 = document.createElement('option');
+            firstOption_tfa169.textContent = "Selecciona por favor";
+            select_tfa169.appendChild(firstOption_tfa169);
+
+            fetch(urlWsPaises, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+
+            })
+                .then(response => response.json())
+                .then(data => {
+
+                    // Agrega las opciones al select
+                    data.forEach(function (d) {
+                        let option = document.createElement('option');
+                        option.textContent = d["D_PAIS"];
+                        option.value = d["N_ID_PAIS"];
+                        select_tfa169.appendChild(option);
+                    });
+
+                    contenedorSelect("País", select_tfa169, input_tfa169_d);
+
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+
+            // Escucha el evento change en el select
+            select_tfa169.addEventListener('change', function () {
+                // Actualiza el valor del input hidden con el valor seleccionado del select
+                let selectedIndex = this.selectedIndex;
+                let selectedText = this.options[selectedIndex].text;
+                let selectedValue = this.value;
+
+                if (selectedText == "Selecciona por favor") {
+                    input_tfa169.value = "";
+                } else {
+                    input_tfa169.value = selectedText;
+                }
+            });
+        }
+
+        /******* FIN PAÍS - INPUT TFA169 *******/
+
+
+        /******* PROVINCIA - INPUT TFA176 *******/
+
+        const input_tfa176 = document.getElementById("tfa_176");
+        const input_tfa176_d = document.getElementById("tfa_176-D");
+        const select_tfa176 = document.createElement('select');
+
+        if (input_tfa176.value == "") {
+            select_tfa176.className = "required";
+
+            let firstOption_tfa176 = document.createElement('option');
+            firstOption_tfa176.textContent = "Selecciona por favor";
+            firstOption_tfa176.value = '';
+            firstOption_tfa176.disabled = true;
+            firstOption_tfa176.selected = true;
+            select_tfa176.appendChild(firstOption_tfa176);
+
+
+            contenedorSelect("Provincia", select_tfa176, input_tfa176_d);
+
+            select_tfa169.addEventListener("change", function () {
+
+                // Restablesco inputs ocultos
+                input_tfa176.value = "";
+                input_tfa45.value = "";
+                select_tfa45.innerHTML = "";
+                let firstOption_tfa45 = document.createElement('option');
+                firstOption_tfa45.textContent = "Selecciona por favor";
+                firstOption_tfa45.value = '';
+                firstOption_tfa45.disabled = true;
+                firstOption_tfa45.selected = true;
+                select_tfa45.appendChild(firstOption_tfa45);
+
+                // Opción seleccionada en país
+                select_tfa169_option = this.options[select_tfa169.selectedIndex];
+
+                let urlWsProvincias = webservice + "?ws_name=provincias&pais=" + select_tfa169_option.value;
+
+                fetch(urlWsProvincias, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+
+                })
+                    .then(response => response.json())
+                    .then(data => {
+
+                        select_tfa176.innerHTML = "";
+
+                        let firstOption_tfa176 = document.createElement('option');
+                        firstOption_tfa176.textContent = "Selecciona por favor";
+                        firstOption_tfa176.value = '';
+                        firstOption_tfa176.disabled = true;
+                        firstOption_tfa176.selected = true;
+                        select_tfa176.appendChild(firstOption_tfa176);
+
+                        // Agrega las opciones al select
+                        data.forEach(function (d) {
+                            let option = document.createElement('option');
+                            option.textContent = d["D_PROVINCIA"];
+                            option.value = d["N_ID_PROVINCIA"];
+                            select_tfa176.appendChild(option);
+                        });
+
+                        //contenedorSelect("Provincia", select_tfa176, input_tfa176_d);
+
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+
+            })
+
+            // Escucha el evento change en el select
+            select_tfa176.addEventListener('change', function () {
+                // Actualiza el valor del input hidden con el valor seleccionado del select
+                let selectedIndex = this.selectedIndex;
+                let selectedText = this.options[selectedIndex].text;
+                let selectedValue = this.value;
+
+                input_tfa176.value = selectedText;
+            });
+        }
+
+        /******* FIN PROVINCIA - INPUT TFA176 *******/
+
+
+        /******* LOCALIDAD - INPUT TFA45 *******/
+
+        const input_tfa45 = document.getElementById("tfa_45");
+        const input_tfa45_d = document.getElementById("tfa_45-D");
+        const select_tfa45 = document.createElement('select');
+
+        if (input_tfa45.value == "") {
+            select_tfa45.className = "required";
+
+            let firstOption_tfa45 = document.createElement('option');
+            firstOption_tfa45.textContent = "Selecciona por favor";
+            firstOption_tfa45.value = '';
+            firstOption_tfa45.disabled = true;
+            firstOption_tfa45.selected = true;
+            select_tfa45.appendChild(firstOption_tfa45);
+
+
+            contenedorSelect("Localidad", select_tfa45, input_tfa45_d);
+
+            select_tfa176.addEventListener("change", function () {
+                input_tfa45.value = "";
+
+                // Opción seleccionada en país
+                select_tfa169_option = select_tfa169.options[select_tfa169.selectedIndex];
+                select_tfa176_option = this.options[select_tfa176.selectedIndex];
+
+                let urlWsLocalidades = webservice + "?ws_name=localidades&pais=" + select_tfa169_option.value + "&provincia=" +
+                    select_tfa176_option.value;
+
+                fetch(urlWsLocalidades, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+
+                })
+                    .then(response => response.json())
+                    .then(data => {
+
+                        select_tfa45.innerHTML = "";
+
+                        let firstOption_tfa45 = document.createElement('option');
+                        firstOption_tfa45.textContent = "Selecciona por favor";
+                        firstOption_tfa45.value = '';
+                        firstOption_tfa45.disabled = true;
+                        firstOption_tfa45.selected = true;
+                        select_tfa45.appendChild(firstOption_tfa45);
+
+                        // Agrega las opciones al select
+                        data.forEach(function (d) {
+                            let option = document.createElement('option');
+                            option.textContent = d["D_LOCALIDAD"];
+                            option.value = d["N_ID_LOCALIDAD"];
+                            select_tfa45.appendChild(option);
+                        });
+
+                        //contenedorSelect("Provincia", select_tfa45, input_tfa45_d);
+
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+
+            })
+
+            // Escucha el evento change en el select
+            select_tfa45.addEventListener('change', function () {
+                // Actualiza el valor del input hidden con el valor seleccionado del select
+                let selectedIndex = this.selectedIndex;
+                let selectedText = this.options[selectedIndex].text;
+                let selectedValue = this.value;
+
+                input_tfa45.value = selectedText;
+            });
+        }
+
+        /******* FIN LOCALIDAD - INPUT TFA45 *******/
+
+        /******* TITULO SECUNDARIO - INPUT TFA240 *******/
+
+        const input_tfa240 = document.getElementById("tfa_240");
+        const input_tfa240_d = document.getElementById("tfa_240-D");
+        const select_tfa240 = document.createElement('select');
+        let urlWTituloSecundario = webservice + "?ws_name=tituloSecundario";
+
+        if (input_tfa240.value == "") {
+            select_tfa240.className = "required";
+
+            let firstOption_tfa240 = document.createElement('option');
+            firstOption_tfa240.textContent = "Selecciona por favor";
+            select_tfa240.appendChild(firstOption_tfa240);
+
+            fetch(urlWTituloSecundario, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            })
+                .then(response => response.json())
+                .then(data => {
+
+                    // Agrega las opciones al select
+                    data.forEach(function (d) {
+                        let option = document.createElement('option');
+                        option.textContent = d["D_TITULO_SECUNDARIO"];
+                        option.value = d["C_TITULO_SECUNDARIO"];
+                        select_tfa240.appendChild(option);
+                    });
+
+                    contenedorSelect("Título obtenido o por obtener", select_tfa240, input_tfa240_d);
+
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+
+            // Escucha el evento change en el select
+            select_tfa240.addEventListener('change', function () {
+                // Actualiza el valor del input hidden con el valor seleccionado del select
+                let selectedIndex = this.selectedIndex;
+                let selectedText = this.options[selectedIndex].text;
+                let selectedValue = this.value;
+
+                if (selectedText == "Selecciona por favor") {
+                    input_tfa240.value = "";
+                } else {
+                    input_tfa240.value = selectedValue;
+
+                    focusInOut(input_tfa240, input_tfa240_d);
+                }
+            });
+        }
+
+        /******* FIN TITULO SECUNDARIO - INPUT TFA240 *******/
+
+
+
+        /*-------------- FIN ANTECEDENTES ACADEMICOS --------------*/
+
+
+        /******* FIN COMO CONOCÍ LA FACULTAD - INPUT TFA251 *******/
+
+        const input_tfa251 = document.getElementById("tfa_251");
+        const input_tfa251_d = document.getElementById("tfa_251-D");
+        const select_tfa251 = document.createElement('select');
+        let urlWsConoci = webservice + "?ws_name=mediosComunicacion";
+
+        if (input_tfa251.value == "") {
+            select_tfa251.className = "required";
+
+            let firstOption_tfa251 = document.createElement('option');
+            firstOption_tfa251.textContent = "Selecciona por favor";
+            select_tfa251.appendChild(firstOption_tfa251);
+
+            fetch(urlWsConoci, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            })
+                .then(response => response.json())
+                .then(data => {
+
+                    // Agrega las opciones al select
+                    data.forEach(function (d) {
+                        let option = document.createElement('option');
+                        option.textContent = d["D_CONOCI_UNIVERSIDAD"];
+                        option.value = d["C_CONOCI_UNIVERSIDAD"];
+                        select_tfa251.appendChild(option);
+                    });
+
+                    contenedorSelect("¿Por qué medio conociste a la Fundación H. A. Barceló?", select_tfa251, input_tfa251_d);
+
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+
+            // Escucha el evento change en el select
+            select_tfa251.addEventListener('change', function () {
+                // Actualiza el valor del input hidden con el valor seleccionado del select
+                let selectedIndex = this.selectedIndex;
+                let selectedText = this.options[selectedIndex].text;
+                let selectedValue = this.value;
+
+                if (selectedText == "Selecciona por favor") {
+                    input_tfa251.value = "";
+                } else {
+                    input_tfa251.value = selectedValue;
+
+                    focusInOut(input_tfa251, input_tfa251_d);
+                }
+            });
+        }
+
+        /******* FIN FIN COMO CONOCÍ LA FACULTAD - INPUT TFA251 *******/
+
+
+
+
+        /*******      SUBMIT    *******/
+        /*
+                let botonSubmit = document.getElementById('submit_button');
+        
+                function handleClick(event) {
+                    // Detiene el envío del formulario
+                    event.preventDefault();
+        
+                    // Muestra el popup de confirmación
+                    Swal.fire({
+                        icon: "warning",
+                        title: "Este es el momento para revisar los datos ingresados antes de enviarlos.",
+                        showDenyButton: true,
+                        confirmButtonText: "Confirmar datos",
+                        denyButtonText: "Revisar",
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+        
+                            
+                            Swal.fire({
+                                title: "Carga de documentación",
+                                text: "Podrás realizar la carga de documentos ahora o en otro momento con el link enviado a tu correo electrónico",
+                                icon: "info",
+                                confirmButtonColor: "#3085d6",
+                                confirmButtonText: "En otro momento",
+                                showDenyButton: true,
+                                denyButtonText: "Cargar ahora",
+                                denyButtonColor: "#C9A789"
+        
+                            }).then((result) => {
+                                const selectedIndex_tfa182 = select_tfa182.selectedIndex;
+                                const selectedText_tfa182 = select_tfa182.options[selectedIndex_tfa182].text;
+        
+                                let nombreUsuario = nombrePropio(input_tfa156.value);
+                                let apellidoUsuario = nombrePropio(input_tfa1.value);
+        
+                                let urlWsToken = "https://pagos.barcelo.edu.ar/backend_fa/ws_formassembly.php?ws_name=token&ipo=" + input_tfa701.value + "&calendario=" + input_tfa699.value + "&marca=" + input_tfa720.value + "&tipoDoc=" + selectedText_tfa182.toUpperCase() + "&nroDoc=" + input_tfa162.value + "&nombres=" + nombreUsuario + "&apellidos=" + apellidoUsuario;
+        
+                                console.log(urlWsToken);
+                                fetch(urlWsToken, {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    },
+                                })
+                                    .then(response => response.json())
+                                    .then(data => {
+        
+                                        input_tfa840.value = data[2];
+        
+                                        if (result.isConfirmed) {
+        
+                                            botonSubmit.removeEventListener("click", handleClick);
+                                            botonSubmit.click();
+                                        } else if (result.isDenied) {
+                                            window.open(data[1], '_blank');
+                                            botonSubmit.removeEventListener("click", handleClick);
+                                            botonSubmit.click();
+                                        }
+                                    })
+                                    .catch(error => {
+                                        console.error('Error:', error);
+                                    });
+        
+                            });
+        
+        
+                            setTimeout(function () {
+                                botonSubmit.addEventListener("click", handleClick);
+                            }, 100);
+        
+                        } else if (result.isDenied) {
+                            return
+                        }
+                    });
+                }
+        
+                // Agrega un evento 'click' al botón submit
+                botonSubmit.addEventListener("click", handleClick);
+        */
+        /*******      FIN SUBMIT     *******/
+
+
+        /*******      SUBMIT    *******/
+        let botonSubmit = document.getElementById('submit_button');
+
+        function handleClick(event) {
+            // Detiene el envío del formulario
+            event.preventDefault();
+
+            // Muestra el popup de confirmación
+            Swal.fire({
+                icon: "warning",
+                title: "Este es el momento para revisar los datos ingresados antes de enviarlos.",
+                showDenyButton: true,
+                confirmButtonText: "Confirmar datos",
+                denyButtonText: "Revisar",
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const selectedIndex_tfa182 = select_tfa182.selectedIndex;
+                    const selectedText_tfa182 = select_tfa182.options[selectedIndex_tfa182].text;
+
+                    let nombreUsuario = nombrePropio(input_tfa156.value);
+                    let apellidoUsuario = nombrePropio(input_tfa1.value);
+
+                    let urlWsToken = "https://pagos.barcelo.edu.ar/backend_fa/ws_formassembly.php?ws_name=token&ipo=" + input_tfa701.value + "&calendario=" + input_tfa699.value + "&marca=" + input_tfa720.value + "&tipoDoc=" + selectedText_tfa182.toUpperCase() + "&nroDoc=" + input_tfa162.value + "&nombres=" + nombreUsuario + "&apellidos=" + apellidoUsuario;
+
+                    fetch(urlWsToken, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+
+                            input_tfa840.value = data[2];
+
+                            botonSubmit.removeEventListener("click", handleClick);
+                            botonSubmit.click();
+
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                        });
+
+                    setTimeout(function () {
+                        botonSubmit.addEventListener("click", handleClick);
+                    }, 100);
+
+                } else if (result.isDenied) {
+                    return
+                }
+            });
+        }
+
+        // Agrega un evento 'click' al botón submit
+        botonSubmit.addEventListener("click", handleClick);
+
+
+        /*******      FIN SUBMIT     *******/
+
+
+        /******* FUNCTIONS *******/
+
+        function contenedorSelect(labelText, select_tfa, input_tfa, id_tfa, oculto) {
+            const div_content = document.createElement('div'); 7
+            let new_id = id_tfa + "-fa";
+            div_content.className = "oneField field-container-D";
+
+            if (oculto) {
+                div_content.className = "oneField field-container-D diplay-none";
+            }
+
+            div_content.setAttribute("id", new_id);
+
+            const label_select = document.createElement('label');
+            label_select.className = "label preField reqMark";
+            label_select.textContent = labelText;
+            div_content.appendChild(label_select);
+            //div_content.appendChild(document.createElement('br'));
+
+            const div_content_input = document.createElement('div');
+            div_content_input.className = "inputWrapper";
+
+            div_content_input.appendChild(select_tfa);
+            div_content.appendChild(div_content_input);
+
+            // Inserta el select después del input hidden
+            input_tfa.insertAdjacentElement('afterend', div_content);
+        }
+
+        function focusInOut(input, input_d) {
+            input_d.classList.remove('wf-acl-hidden');
+            input.focus();
+            input.blur();
+            input_d.classList.add('wf-acl-hidden');
+        }
+
+        function nombrePropio(texto) {
+
+            var cadena = texto.toLowerCase().split(' ');
+
+            for (var i = 0; i < cadena.length; i++) {
+                cadena[i] = cadena[i].charAt(0).toUpperCase() + cadena[i].substring(1);
+            }
+            texto = cadena.join(' ');
+
+            return texto;
+        }
+
+        /******* FIN FUNCTIONS *******/
+
+    })
+
+</script>

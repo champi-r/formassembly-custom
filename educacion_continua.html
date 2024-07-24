@@ -1,0 +1,1124 @@
+<style>
+    .swal2-title {
+        font-family: 'Montserrat', sans-serif;
+    }
+
+    .display-none {
+        display: none;
+    }
+
+    #tfa_734-D>label,
+    #tfa_734-D>.inputWrapper {
+        display: none;
+    }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const webservice = "https://pagos.barcelo.edu.ar/backend_fa/ws_formassembly.php";
+
+        /*-------------- CARRERA ELEGIDA --------------*/
+
+        /******* MODALIDAD - INPUT TFA737 *******/
+
+        const input_tfa737 = document.getElementById("tfa_737");
+        const input_tfa737_d = document.getElementById("tfa_737-D");
+        const select_tfa737 = document.createElement('select');
+
+        if (input_tfa737.value == "") {
+            select_tfa737.className = "required";
+
+            let firstOption_tfa737 = document.createElement('option');
+            firstOption_tfa737.textContent = "Selecciona por favor";
+            firstOption_tfa737.value = '';
+            firstOption_tfa737.disabled = true;
+            firstOption_tfa737.selected = true;
+            select_tfa737.appendChild(firstOption_tfa737);
+
+            //contenedorSelect("Sede", select_tfa737, input_tfa737_d);
+
+            let urlWsModalidad = webservice + "?ws_name=modalidad";
+
+            fetch(urlWsModalidad, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            })
+                .then(response => response.json())
+                .then(data => {
+                    // Agrega las opciones al select
+                    data.forEach(function (d) {
+                        let option = document.createElement('option');
+                        option.textContent = d["DESCRIPCION"];
+                        option.value = d["C_MODALIDAD"];
+                        select_tfa737.appendChild(option);
+                    });
+
+                    contenedorSelect("Modalidad", select_tfa737, input_tfa737_d);
+
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+
+            // Escucha el evento change en el select
+            select_tfa737.addEventListener('change', function () {
+                // Actualiza el valor del input hidden con el valor seleccionado del select
+                let selectedIndex = this.selectedIndex;
+                let selectedText = this.options[selectedIndex].text;
+                let selectedValue = this.value;
+
+                if (selectedText == "Selecciona por favor") {
+                    input_tfa737.value = "";
+                } else {
+                    input_tfa737.value = selectedValue;
+                }
+            });
+        }
+
+        /******* FIN MODALIDAD - INPUT TFA737 *******/
+
+        /******* SEDE - INPUT TFA739 *******/
+
+        const input_tfa739 = document.getElementById("tfa_739");
+        const input_tfa739_d = document.getElementById("tfa_739-D");
+        const select_tfa739 = document.createElement('select');
+
+        if (input_tfa739.value == "") {
+            select_tfa739.className = "required";
+
+            let firstOption_tfa739 = document.createElement('option');
+            firstOption_tfa739.textContent = "Selecciona por favor";
+            firstOption_tfa739.value = '';
+            firstOption_tfa739.disabled = true;
+            firstOption_tfa739.selected = true;
+            select_tfa739.appendChild(firstOption_tfa739);
+
+            contenedorSelect("Sede", select_tfa739, input_tfa739_d, input_tfa739.id);
+
+            select_tfa737.addEventListener("change", function () {
+                
+                // Reset de inputs
+                input_tfa739.value = "";
+
+                input_tfa731.value = "";
+                select_tfa731.innerHTML = '<option value="" disabled selected>Selecciona por favor</option>';
+                input_tfa728.value = "";
+                select_tfa728.innerHTML = '<option value="" disabled selected>Selecciona por favor</option>';
+
+                if (select_tfa737.value === "P") {
+                    let input_tfa739_fa = document.getElementById('tfa_739-fa');
+                    input_tfa739_fa.classList.remove('display-none');
+                
+                    let urlWsSedes = webservice + "?ws_name=sedes";
+        
+                    fetch(urlWsSedes, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            select_tfa739.innerHTML = "";
+    
+                            let firstOption_tfa739 = document.createElement('option');
+                            firstOption_tfa739.textContent = "Selecciona por favor";
+                            firstOption_tfa739.value = '';
+                            firstOption_tfa739.disabled = true;
+                            firstOption_tfa739.selected = true;
+                            select_tfa739.appendChild(firstOption_tfa739);
+    
+                            // Agrega las opciones al select
+                            data.forEach(function (d) {
+                                let option = document.createElement('option');
+                                option.textContent = d["SEDE"];
+                                option.value = d["C_SEDE"];
+                                select_tfa739.appendChild(option);
+                            });
+        
+                            //contenedorSelect("Sede", select_tfa739, input_tfa739_d);
+        
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                        });
+                
+                } else {
+                    let input_tfa739_fa = document.getElementById('tfa_739-fa');
+                    input_tfa739_fa.classList.add('display-none');
+                    input_tfa739.value=1;
+                }
+
+            })
+
+
+            // Escucha el evento change en el select
+            select_tfa739.addEventListener('change', function () {
+                // Actualiza el valor del input hidden con el valor seleccionado del select
+                let selectedIndex = this.selectedIndex;
+                let selectedText = this.options[selectedIndex].text;
+                let selectedValue = this.value;
+
+                if (selectedText == "Selecciona por favor") {
+                    input_tfa739.value = "";
+                } else {
+                    input_tfa739.value = selectedValue;
+                }
+            });
+        }
+
+        /******* FIN SEDE - INPUT TFA739 *******/
+
+        /******* CARRERA - INPUT TFA731 *******/
+
+        const input_tfa731 = document.getElementById("tfa_731");
+        const input_tfa731_d = document.getElementById("tfa_731-D");
+        const select_tfa731 = document.createElement('select');
+
+        if (input_tfa731.value == "") {
+            select_tfa731.className = "required";
+
+            let firstOption_tfa731 = document.createElement('option');
+            firstOption_tfa731.textContent = "Selecciona por favor";
+            firstOption_tfa731.value = '';
+            firstOption_tfa731.disabled = true;
+            firstOption_tfa731.selected = true;
+            select_tfa731.appendChild(firstOption_tfa731);
+
+            contenedorSelect("Carrera", select_tfa731, input_tfa731_d);
+
+            select_tfa739.addEventListener("change", function () {
+                input_tfa731.value = "";
+
+                input_tfa728.value = "";
+                select_tfa728.innerHTML = '<option value="" disabled selected>Selecciona por favor</option>';
+
+                // Opción seleccionada 
+                select_tfa737_option = select_tfa737.options[select_tfa737.selectedIndex];
+                select_tfa739_option = this.options[select_tfa739.selectedIndex];
+
+                let urlWsProgramasEDC = webservice + "?ws_name=programasEDC&modalidad=" + select_tfa737_option.value + "&sede=" +
+                    select_tfa739_option.value;
+
+                fetch(urlWsProgramasEDC, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                })
+                    .then(response => response.json())
+                    .then(data => {
+
+                        select_tfa731.innerHTML = "";
+
+                        let firstOption_tfa731 = document.createElement('option');
+                        firstOption_tfa731.textContent = "Selecciona por favor";
+                        firstOption_tfa731.value = '';
+                        firstOption_tfa731.disabled = true;
+                        firstOption_tfa731.selected = true;
+                        select_tfa731.appendChild(firstOption_tfa731);
+
+                        // Agrega las opciones al select
+                        data.forEach(function (d) {
+                            console.log(d);
+                            let option = document.createElement('option');
+                            option.textContent = d[4];
+                            option.value = d[3];
+                            option.classList.add(d[5]);
+                            select_tfa731.appendChild(option);
+                        });
+
+                        //contenedorSelect("Provincia", select_tfa731, input_tfa731_d);
+
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+            })
+
+            // Escucha el evento change en el select
+            select_tfa731.addEventListener('change', function () {
+                // Actualiza el valor del input hidden con el valor seleccionado del select
+                let selectedIndex = this.selectedIndex;
+                let selectedText = this.options[selectedIndex].text;
+                let selectedValue = this.value;
+                let selectIdSaleforce = this.options[selectedIndex].className;
+
+                input_tfa731.value = selectedValue;
+            });
+        }
+
+        /******* FIN CARRERA - INPUT TFA731 *******/
+
+        /******* CALENDARIO - INPUT TFA728 *******/
+
+        const input_tfa728 = document.getElementById("tfa_728");
+        const input_tfa728_d = document.getElementById("tfa_728-D");
+        const select_tfa728 = document.createElement('select');
+
+        if (input_tfa728.value == "") {
+            select_tfa728.className = "required";
+
+            let firstOption_tfa728 = document.createElement('option');
+            firstOption_tfa728.textContent = "Selecciona por favor";
+            firstOption_tfa728.value = '';
+            firstOption_tfa728.disabled = true;
+            firstOption_tfa728.selected = true;
+            select_tfa728.appendChild(firstOption_tfa728);
+
+            contenedorSelect("¿En que mes te gustaría iniciar la cursada?", select_tfa728, input_tfa728_d);
+
+            select_tfa731.addEventListener("change", function () {
+                input_tfa728.value = "";
+
+                // Opción seleccionada 
+                select_tfa739_option = select_tfa739.options[select_tfa739.selectedIndex];
+                select_tfa731_option = this.options[select_tfa731.selectedIndex];
+
+                let urlWsCalendariosEDC = webservice + "?ws_name=calendariosEDC&modalidad=" + select_tfa737_option.value + "&sede=" +
+                    select_tfa739_option.value + "&ipo=" + select_tfa731_option.value ;
+
+                fetch(urlWsCalendariosEDC, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                })
+                    .then(response => response.json())
+                    .then(data => {
+
+                        select_tfa728.innerHTML = "";
+
+                        let firstOption_tfa728 = document.createElement('option');
+                        firstOption_tfa728.textContent = "Selecciona por favor";
+                        firstOption_tfa728.value = '';
+                        firstOption_tfa728.disabled = true;
+                        firstOption_tfa728.selected = true;
+                        select_tfa728.appendChild(firstOption_tfa728);
+
+                        // Agrega las opciones al select
+                        data.forEach(function (d) {
+                            console.log(d);
+                            let option = document.createElement('option');
+                            option.textContent = d[1];
+                            option.value = d[0];
+                            select_tfa728.appendChild(option);
+                        });
+
+                        //contenedorSelect("Provincia", select_tfa728, input_tfa728_d);
+
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+            })
+
+            // Escucha el evento change en el select
+            select_tfa728.addEventListener('change', function () {
+                // Actualiza el valor del input hidden con el valor seleccionado del select
+                let selectedIndex = this.selectedIndex;
+                let selectedText = this.options[selectedIndex].text;
+                let selectedValue = this.value;
+                let selectIdSaleforce = this.options[selectedIndex].className;
+
+                input_tfa728.value = selectedValue;
+            });
+        }
+
+        /******* FIN CALENDARIO - INPUT TFA728 *******/
+
+
+        /*-------------- FIN CARRERA ELEGIDA --------------*/
+
+        /*-------------- INFORMACIÓN PERSONAL --------------*/
+        /******* SEXO - INPUT TFA695 *******/
+
+        const input_tfa695 = document.getElementById("tfa_695");
+        const input_tfa695_d = document.getElementById("tfa_695-D");
+        const select_tfa695 = document.createElement('select');
+
+        if (input_tfa695.value == "") {
+            select_tfa695.className = "required";
+
+            let firstOption_tfa695 = document.createElement('option');
+            firstOption_tfa695.textContent = "Selecciona por favor";
+            select_tfa695.appendChild(firstOption_tfa695);
+
+            let urlWsSexo = webservice + "?ws_name=sexo";
+
+            fetch(urlWsSexo, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            })
+                .then(response => response.json())
+                .then(data => {
+                    // Agrega las opciones al select
+                    data.forEach(function (d) {
+                        let option = document.createElement('option');
+                        option.textContent = d["D_SEXO"];
+                        option.value = d["C_SEXO"];
+                        select_tfa695.appendChild(option);
+                    });
+
+                    contenedorSelect("Sexo", select_tfa695, input_tfa695_d);
+
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+
+            // Escucha el evento change en el select
+            select_tfa695.addEventListener('change', function () {
+                // Actualiza el valor del input hidden con el valor seleccionado del select
+                let selectedIndex = this.selectedIndex;
+                let selectedText = this.options[selectedIndex].text;
+                let selectedValue = this.value;
+
+                if (selectedText == "Selecciona por favor") {
+                    input_tfa695.value = "";
+                } else {
+                    input_tfa695.value = selectedValue;
+                }
+            });
+        }
+
+        /******* FIN SEXO - INPUT TFA695 *******/
+
+
+        /******* GÉNERO - INPUT TFA16 *******/
+
+        const input_tfa16 = document.getElementById("tfa_16");
+        const input_tfa16_d = document.getElementById("tfa_16-D");
+        const select_tfa16 = document.createElement('select');
+
+        if (input_tfa16.value == "") {
+            select_tfa16.className = "required";
+
+            let firstOption_tfa16 = document.createElement('option');
+            firstOption_tfa16.textContent = "Selecciona por favor";
+            select_tfa16.appendChild(firstOption_tfa16);
+
+            let urlWsGenero = webservice + "?ws_name=generos";
+
+            fetch(urlWsGenero, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            })
+                .then(response => response.json())
+                .then(data => {
+                    // Agrega las opciones al select
+                    data.forEach(function (d) {
+                        let option = document.createElement('option');
+                        option.textContent = d["D_GENERO"];
+                        option.value = d["C_GENERO"];
+                        select_tfa16.appendChild(option);
+                    });
+
+                    contenedorSelect("Género", select_tfa16, input_tfa16_d);
+
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+
+            // Escucha el evento change en el select
+            select_tfa16.addEventListener('change', function () {
+                // Actualiza el valor del input hidden con el valor seleccionado del select
+                let selectedIndex = this.selectedIndex;
+                let selectedText = this.options[selectedIndex].text;
+                let selectedValue = this.value;
+
+                if (selectedText == "Selecciona por favor") {
+                    input_tfa16.value = "";
+                } else {
+                    input_tfa16.value = selectedValue;
+
+                    focusInOut(input_tfa16, input_tfa16_d);
+                }
+            });
+        }
+
+        /******* FIN GÉNERO - INPUT TFA16 *******/
+
+
+        /******* NACIONALIDAD - INPUT TFA67 *******/
+
+        const input_tfa67 = document.getElementById("tfa_67");
+        const input_tfa67_d = document.getElementById("tfa_67-D");
+        const select_tfa67 = document.createElement('select');
+
+        if (input_tfa67.value == "") {
+            select_tfa67.className = "required";
+
+            let firstOption_tfa67 = document.createElement('option');
+            firstOption_tfa67.textContent = "Selecciona por favor";
+            select_tfa67.appendChild(firstOption_tfa67);
+
+            let urlWsNacionalidad = webservice + "?ws_name=nacionalidades";
+
+            fetch(urlWsNacionalidad, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            })
+                .then(response => response.json())
+                .then(data => {
+                    // Agrega las opciones al select
+                    data.forEach(function (d) {
+                        let option = document.createElement('option');
+                        option.textContent = d["D_NACIONALIDAD"];
+                        option.value = d["C_NACIONALIDAD"];
+                        select_tfa67.appendChild(option);
+                    });
+
+                    contenedorSelect("Nacionalidad", select_tfa67, input_tfa67_d);
+
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+
+            // Escucha el evento change en el select
+            select_tfa67.addEventListener('change', function () {
+                // Actualiza el valor del input hidden con el valor seleccionado del select
+                let selectedIndex = this.selectedIndex;
+                let selectedText = this.options[selectedIndex].text;
+                let selectedValue = this.value;
+
+                if (selectedText == "Selecciona por favor") {
+                    input_tfa67.value = "";
+                } else {
+                    input_tfa67.value = selectedValue;
+                }
+            });
+        }
+
+        /******* FIN NACIONALIDAD - INPUT TFA67 *******/
+
+
+
+        /******* PAÍS - INPUT TFA170 *******/
+
+        const input_tfa170 = document.getElementById("tfa_170");
+        const input_tfa170_d = document.getElementById("tfa_170-D");
+        const select_tfa170 = document.createElement('select');
+        let urlWsPaises = webservice + "?ws_name=paises";
+
+        if (input_tfa170.value == "") {
+            select_tfa170.className = "required";
+
+            let firstOption_tfa170 = document.createElement('option');
+            firstOption_tfa170.textContent = "Selecciona por favor";
+            select_tfa170.appendChild(firstOption_tfa170);
+
+            fetch(urlWsPaises, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            })
+                .then(response => response.json())
+                .then(data => {
+                    // Agrega las opciones al select
+                    data.forEach(function (d) {
+                        let option = document.createElement('option');
+                        option.textContent = d["D_PAIS"];
+                        option.value = d["N_ID_PAIS"];
+                        option.classList.add(d["SF_ID_PAIS"]);
+                        select_tfa170.appendChild(option);
+                    });
+
+                    contenedorSelect("País de nacimiento", select_tfa170, input_tfa170_d);
+
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+
+            // Escucha el evento change en el select
+            select_tfa170.addEventListener('change', function () {
+                // Actualiza el valor del input hidden con el valor seleccionado del select
+                let selectedIndex = this.selectedIndex;
+                let selectedText = this.options[selectedIndex].text;
+                let selectedValue = this.value;
+                let selectIdSaleforce = this.options[selectedIndex].className;
+
+                if (selectedText == "Selecciona por favor") {
+                    input_tfa170.value = "";
+                } else {
+                    input_tfa170.value = selectIdSaleforce;
+                }
+            });
+        }
+
+        /******* FIN PAÍS - INPUT TFA170 *******/
+
+
+        /******* PROVINCIA - INPUT TFA177 *******/
+
+        const input_tfa177 = document.getElementById("tfa_177");
+        const input_tfa177_d = document.getElementById("tfa_177-D");
+        const select_tfa177 = document.createElement('select');
+
+        if (input_tfa177.value == "") {
+            select_tfa177.className = "required";
+
+            let firstOption_tfa177 = document.createElement('option');
+            firstOption_tfa177.textContent = "Selecciona por favor";
+            firstOption_tfa177.value = '';
+            firstOption_tfa177.disabled = true;
+            firstOption_tfa177.selected = true;
+            select_tfa177.appendChild(firstOption_tfa177);
+
+            contenedorSelect("Provincia de nacimiento", select_tfa177, input_tfa177_d);
+
+            select_tfa170.addEventListener("change", function () {
+
+                // Restablesco inputs ocultos
+                input_tfa177.value = "";
+                input_tfa46.value = "";
+                select_tfa46.innerHTML = "";
+                let firstOption_tfa46 = document.createElement('option');
+                firstOption_tfa46.textContent = "Selecciona por favor";
+                firstOption_tfa46.value = '';
+                firstOption_tfa46.disabled = true;
+                firstOption_tfa46.selected = true;
+                select_tfa46.appendChild(firstOption_tfa46);
+
+                // Opción seleccionada en país
+                select_tfa170_option = this.options[select_tfa170.selectedIndex];
+
+                let urlWsProvincias = webservice + "?ws_name=provincias&pais=" + select_tfa170_option.value;
+
+                fetch(urlWsProvincias, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                })
+                    .then(response => response.json())
+                    .then(data => {
+
+                        select_tfa177.innerHTML = "";
+
+                        let firstOption_tfa177 = document.createElement('option');
+                        firstOption_tfa177.textContent = "Selecciona por favor";
+                        firstOption_tfa177.value = '';
+                        firstOption_tfa177.disabled = true;
+                        firstOption_tfa177.selected = true;
+                        select_tfa177.appendChild(firstOption_tfa177);
+
+                        // Agrega las opciones al select
+                        data.forEach(function (d) {
+                            let option = document.createElement('option');
+                            option.textContent = d["D_PROVINCIA"];
+                            option.value = d["N_ID_PROVINCIA"];
+                            option.classList.add(d["SF_ID_PROVINCIA"]);
+                            select_tfa177.appendChild(option);
+                        });
+
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+            })
+
+            // Escucha el evento change en el select
+            select_tfa177.addEventListener('change', function () {
+                // Actualiza el valor del input hidden con el valor seleccionado del select
+                let selectedIndex = this.selectedIndex;
+                let selectedText = this.options[selectedIndex].text;
+                let selectedValue = this.value;
+                let selectIdSaleforce = this.options[selectedIndex].className;
+
+                input_tfa177.value = selectIdSaleforce;
+            });
+        }
+
+        /******* FIN PROVINCIA - INPUT TFA177 *******/
+
+
+        /******* LOCALIDAD - INPUT TFA46 *******/
+
+        const input_tfa46 = document.getElementById("tfa_46");
+        const input_tfa46_d = document.getElementById("tfa_46-D");
+        const select_tfa46 = document.createElement('select');
+
+        if (input_tfa46.value == "") {
+            select_tfa46.className = "required";
+
+            let firstOption_tfa46 = document.createElement('option');
+            firstOption_tfa46.textContent = "Selecciona por favor";
+            firstOption_tfa46.value = '';
+            firstOption_tfa46.disabled = true;
+            firstOption_tfa46.selected = true;
+            select_tfa46.appendChild(firstOption_tfa46);
+
+            contenedorSelect("Localidad de nacimiento", select_tfa46, input_tfa46_d);
+
+            select_tfa177.addEventListener("change", function () {
+                input_tfa46.value = "";
+
+                // Opción seleccionada en país
+                select_tfa170_option = select_tfa170.options[select_tfa170.selectedIndex];
+                select_tfa177_option = this.options[select_tfa177.selectedIndex];
+
+                let urlWsLocalidades = webservice + "?ws_name=localidades&pais=" + select_tfa170_option.value + "&provincia=" +
+                    select_tfa177_option.value;
+
+                fetch(urlWsLocalidades, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                })
+                    .then(response => response.json())
+                    .then(data => {
+
+                        select_tfa46.innerHTML = "";
+
+                        let firstOption_tfa46 = document.createElement('option');
+                        firstOption_tfa46.textContent = "Selecciona por favor";
+                        firstOption_tfa46.value = '';
+                        firstOption_tfa46.disabled = true;
+                        firstOption_tfa46.selected = true;
+                        select_tfa46.appendChild(firstOption_tfa46);
+
+                        // Agrega las opciones al select
+                        data.forEach(function (d) {
+                            let option = document.createElement('option');
+                            option.textContent = d["D_LOCALIDAD"];
+                            option.value = d["N_ID_LOCALIDAD"];
+                            option.classList.add(d["SF_ID_LOCALIDAD"]);
+                            select_tfa46.appendChild(option);
+                        });
+
+                        //contenedorSelect("Provincia", select_tfa46, input_tfa46_d);
+
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+            })
+
+            // Escucha el evento change en el select
+            select_tfa46.addEventListener('change', function () {
+                // Actualiza el valor del input hidden con el valor seleccionado del select
+                let selectedIndex = this.selectedIndex;
+                let selectedText = this.options[selectedIndex].text;
+                let selectedValue = this.value;
+                let selectIdSaleforce = this.options[selectedIndex].className;
+
+                input_tfa46.value = selectIdSaleforce;
+            });
+        }
+
+        /******* FIN LOCALIDAD - INPUT TFA46 *******/
+        /*-------------- FIN INFORMACIÓN PERSONAL --------------*/
+
+        /*-------------- DOMICILIO PARTICULAR --------------*/
+        /******* PAÍS - INPUT TFA727 *******/
+
+        const input_tfa727 = document.getElementById("tfa_727");
+        const input_tfa727_d = document.getElementById("tfa_727-D");
+        const select_tfa727 = document.createElement('select');
+
+        if (input_tfa727.value == "") {
+            select_tfa727.className = "required";
+
+            let firstOption_tfa727 = document.createElement('option');
+            firstOption_tfa727.textContent = "Selecciona por favor";
+            select_tfa727.appendChild(firstOption_tfa727);
+
+            fetch(urlWsPaises, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            })
+                .then(response => response.json())
+                .then(data => {
+                    // Agrega las opciones al select
+                    data.forEach(function (d) {
+                        let option = document.createElement('option');
+                        option.textContent = d["D_PAIS"];
+                        option.value = d["N_ID_PAIS"];
+                        option.classList.add(d["SF_ID_PAIS"]);
+                        select_tfa727.appendChild(option);
+                    });
+
+                    contenedorSelect("País", select_tfa727, input_tfa727_d);
+
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+
+            // Escucha el evento change en el select
+            select_tfa727.addEventListener('change', function () {
+                // Actualiza el valor del input hidden con el valor seleccionado del select
+                let selectedIndex = this.selectedIndex;
+                let selectedText = this.options[selectedIndex].text;
+                let selectedValue = this.value;
+                let selectIdSaleforce = this.options[selectedIndex].className;
+
+                if (selectedText == "Selecciona por favor") {
+                    input_tfa727.value = "";
+                } else {
+                    input_tfa727.value = selectIdSaleforce;
+                }
+            });
+        }
+
+        /******* FIN PAÍS - INPUT TFA727 *******/
+
+
+        /******* PROVINCIA - INPUT TFA726 *******/
+
+        const input_tfa726 = document.getElementById("tfa_726");
+        const input_tfa726_d = document.getElementById("tfa_726-D");
+        const select_tfa726 = document.createElement('select');
+
+        if (input_tfa726.value == "") {
+            select_tfa726.className = "required";
+
+            let firstOption_tfa726 = document.createElement('option');
+            firstOption_tfa726.textContent = "Selecciona por favor";
+            firstOption_tfa726.value = '';
+            firstOption_tfa726.disabled = true;
+            firstOption_tfa726.selected = true;
+            select_tfa726.appendChild(firstOption_tfa726);
+
+
+            contenedorSelect("Provincia", select_tfa726, input_tfa726_d);
+
+            select_tfa727.addEventListener("change", function () {
+
+                // Restablesco inputs ocultos
+                input_tfa726.value = "";
+                input_tfa725.value = "";
+                select_tfa725.innerHTML = "";
+                let firstOption_tfa725 = document.createElement('option');
+                firstOption_tfa725.textContent = "Selecciona por favor";
+                firstOption_tfa725.value = '';
+                firstOption_tfa725.disabled = true;
+                firstOption_tfa725.selected = true;
+                select_tfa725.appendChild(firstOption_tfa725);
+
+                // Opción seleccionada en país
+                select_tfa727_option = this.options[select_tfa727.selectedIndex];
+
+                let urlWsProvincias = webservice + "?ws_name=provincias&pais=" + select_tfa727_option.value;
+
+                fetch(urlWsProvincias, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                })
+                    .then(response => response.json())
+                    .then(data => {
+
+                        select_tfa726.innerHTML = "";
+
+                        let firstOption_tfa726 = document.createElement('option');
+                        firstOption_tfa726.textContent = "Selecciona por favor";
+                        firstOption_tfa726.value = '';
+                        firstOption_tfa726.disabled = true;
+                        firstOption_tfa726.selected = true;
+                        select_tfa726.appendChild(firstOption_tfa726);
+
+                        // Agrega las opciones al select
+                        data.forEach(function (d) {
+                            let option = document.createElement('option');
+                            option.textContent = d["D_PROVINCIA"];
+                            option.value = d["N_ID_PROVINCIA"];
+                            option.classList.add(d["SF_ID_PROVINCIA"]);
+                            select_tfa726.appendChild(option);
+                        });
+
+                        //contenedorSelect("Provincia", select_tfa726, input_tfa726_d);
+
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+            })
+
+            // Escucha el evento change en el select
+            select_tfa726.addEventListener('change', function () {
+                // Actualiza el valor del input hidden con el valor seleccionado del select
+                let selectedIndex = this.selectedIndex;
+                let selectedText = this.options[selectedIndex].text;
+                let selectedValue = this.value;
+                let selectIdSaleforce = this.options[selectedIndex].className;
+
+                input_tfa726.value = selectIdSaleforce;
+            });
+        }
+
+        /******* FIN PROVINCIA - INPUT TFA726 *******/
+
+
+        /******* LOCALIDAD - INPUT TFA725 *******/
+
+        const input_tfa725 = document.getElementById("tfa_725");
+        const input_tfa725_d = document.getElementById("tfa_725-D");
+        const select_tfa725 = document.createElement('select');
+
+        if (input_tfa725.value == "") {
+            select_tfa725.className = "required";
+
+            let firstOption_tfa725 = document.createElement('option');
+            firstOption_tfa725.textContent = "Selecciona por favor";
+            firstOption_tfa725.value = '';
+            firstOption_tfa725.disabled = true;
+            firstOption_tfa725.selected = true;
+            select_tfa725.appendChild(firstOption_tfa725);
+
+            contenedorSelect("Localidad", select_tfa725, input_tfa725_d);
+
+            select_tfa726.addEventListener("change", function () {
+                input_tfa725.value = "";
+
+                // Opción seleccionada en país
+                select_tfa727_option = select_tfa727.options[select_tfa727.selectedIndex];
+                select_tfa726_option = this.options[select_tfa726.selectedIndex];
+
+                let urlWsLocalidades = webservice + "?ws_name=localidades&pais=" + select_tfa727_option.value + "&provincia=" +
+                    select_tfa726_option.value;
+
+                console.log(urlWsLocalidades);
+                fetch(urlWsLocalidades, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                })
+                    .then(response => response.json())
+                    .then(data => {
+
+                        select_tfa725.innerHTML = "";
+
+                        let firstOption_tfa725 = document.createElement('option');
+                        firstOption_tfa725.textContent = "Selecciona por favor";
+                        firstOption_tfa725.value = '';
+                        firstOption_tfa725.disabled = true;
+                        firstOption_tfa725.selected = true;
+                        select_tfa725.appendChild(firstOption_tfa725);
+
+                        // Agrega las opciones al select
+                        data.forEach(function (d) {
+                            let option = document.createElement('option');
+                            option.textContent = d["D_LOCALIDAD"];
+                            option.value = d["N_ID_LOCALIDAD"];
+                            option.classList.add(d["SF_ID_LOCALIDAD"]);
+                            select_tfa725.appendChild(option);
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+            })
+
+            // Escucha el evento change en el select
+            select_tfa725.addEventListener('change', function () {
+                // Actualiza el valor del input hidden con el valor seleccionado del select
+                let selectedIndex = this.selectedIndex;
+                let selectedText = this.options[selectedIndex].text;
+                let selectedValue = this.value;
+                let selectIdSaleforce = this.options[selectedIndex].className;
+
+                input_tfa725.value = selectIdSaleforce;
+            });
+        }
+
+        /******* FIN LOCALIDAD - INPUT TFA725 *******/
+        /*-------------- FIN DOMICILIO PARTICULAR --------------*/
+
+
+
+        /*-------------- DATOS PROFESIONALES --------------*/
+        /******* DONDE TRABAJA - INPUT TFA703 *******/
+
+        const input_tfa703 = document.getElementById("tfa_703");
+        const input_tfa703_d = document.getElementById("tfa_703-D");
+        const select_tfa703 = document.createElement('select');
+
+        if (input_tfa703.value == "") {
+            select_tfa703.className = "required";
+
+            let firstOption_tfa703 = document.createElement('option');
+            firstOption_tfa703.textContent = "Selecciona por favor";
+            select_tfa703.appendChild(firstOption_tfa703);
+
+            let urlWsEmpresas = webservice + "?ws_name=empresas";
+
+            fetch(urlWsEmpresas, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            })
+                .then(response => response.json())
+                .then(data => {
+
+                    // Agrega las opciones al select
+                    data.forEach(function (d) {
+                        let option = document.createElement('option');
+                        option.textContent = d["D_EMPRESA"];
+                        option.value = d["SF_ID_EMPRESA"];
+                        select_tfa703.appendChild(option);
+                    });
+
+                    contenedorSelect("Institución", select_tfa703, input_tfa703_d);
+
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+
+            // Escucha el evento change en el select
+            select_tfa703.addEventListener('change', function () {
+                // Actualiza el valor del input hidden con el valor seleccionado del select
+                let selectedIndex = this.selectedIndex;
+                let selectedText = this.options[selectedIndex].text;
+                let selectedValue = this.value;
+
+                if (selectedText == "Selecciona por favor") {
+                    input_tfa703.value = "";
+                } else {
+                    input_tfa703.value = selectedValue;
+                }
+            });
+        }
+
+        /******* FIN DONDE TRABAJA - INPUT TFA703 *******/
+
+        /******* CARGO - INPUT TFA705 *******/
+
+        const input_tfa705 = document.getElementById("tfa_705");
+        const input_tfa705_d = document.getElementById("tfa_705-D");
+        const select_tfa705 = document.createElement('select');
+
+        if (input_tfa705.value == "") {
+            select_tfa705.className = "required";
+
+            let firstOption_tfa705 = document.createElement('option');
+            firstOption_tfa705.textContent = "Selecciona por favor";
+            select_tfa705.appendChild(firstOption_tfa705);
+
+            let urlWsCargo = webservice + "?ws_name=cargos";
+
+            fetch(urlWsCargo, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            })
+                .then(response => response.json())
+                .then(data => {
+
+                    // Agrega las opciones al select
+                    data.forEach(function (d) {
+                        let option = document.createElement('option');
+                        option.textContent = d["D_CARGO"];
+                        option.value = d["C_CARGO"];
+                        select_tfa705.appendChild(option);
+                    });
+
+                    contenedorSelect("Cargo", select_tfa705, input_tfa705_d);
+
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+
+            // Escucha el evento change en el select
+            select_tfa705.addEventListener('change', function () {
+                // Actualiza el valor del input hidden con el valor seleccionado del select
+                let selectedIndex = this.selectedIndex;
+                let selectedText = this.options[selectedIndex].text;
+                let selectedValue = this.value;
+
+                if (selectedText == "Selecciona por favor") {
+                    input_tfa705.value = "";
+                } else {
+                    input_tfa705.value = selectedText;
+                }
+            });
+        }
+
+        /******* FIN CARGO - INPUT TFA705 *******/
+
+        /*-------------- FIN DATOS PROFESIONALES --------------*/
+
+
+
+
+
+
+
+        /******* FUNCTIONS *******/
+
+        function contenedorSelect(labelText, select_tfa, input_tfa, id_tfa, oculto) {
+            const div_content = document.createElement('div'); 7
+            let new_id = id_tfa + "-fa";
+            div_content.className = "oneField field-container-D";
+
+            if (oculto) {
+                div_content.className = "oneField field-container-D diplay-none";
+            }
+
+            div_content.setAttribute("id", new_id);
+
+            const label_select = document.createElement('label');
+            label_select.className = "label preField reqMark";
+            label_select.textContent = labelText;
+            div_content.appendChild(label_select);
+            //div_content.appendChild(document.createElement('br'));
+
+            const div_content_input = document.createElement('div');
+            div_content_input.className = "inputWrapper";
+
+            div_content_input.appendChild(select_tfa);
+            div_content.appendChild(div_content_input);
+
+            // Inserta el select después del input hidden
+            input_tfa.insertAdjacentElement('afterend', div_content);
+        }
+
+        function focusInOut(input, input_d) {
+            input_d.classList.remove('wf-acl-hidden');
+            input.focus();
+            input.blur();
+            input_d.classList.add('wf-acl-hidden');
+        }
+
+        function nombrePropio(texto) {
+
+            var cadena = texto.toLowerCase().split(' ');
+
+            for (var i = 0; i < cadena.length; i++) {
+                cadena[i] = cadena[i].charAt(0).toUpperCase() + cadena[i].substring(1);
+            }
+            texto = cadena.join(' ');
+
+            return texto;
+        }
+
+        /******* FIN FUNCTIONS *******/
+
+    })
+
+</script>
