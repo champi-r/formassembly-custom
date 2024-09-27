@@ -1,0 +1,1632 @@
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css">
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<style>
+    .swal2-title {
+        font-family: 'Montserrat', sans-serif;
+    }
+
+    .display-none {
+        display: none;
+    }
+
+    #tfa_734-D>label,
+    #tfa_734-D>.inputWrapper {
+        display: none;
+    }
+
+    .select2-search textarea {
+        height: 1em !important;
+        border: none !important;
+    }
+
+    .select2-search .wFormContainer .wForm .inputWrapper textarea {
+        padding: 0 !important;
+    }
+
+
+    .wFormContainer .wForm .inputWrapper .select2-search textarea:focus {
+        border: none !important;
+    }
+
+    .select2-container--default .select2-selection--multiple,
+    .select2-container--default.select2-container--focus .select2-selection--multiple {
+        font-family: 'Montserrat', sans-serif;
+        border: 1px solid #d8dde6;
+        border-radius: 2px;
+        min-width: 20em;
+    }
+
+    .select2-container--default ul {
+        margin: 0 !important;
+    }
+
+    .select2-results__option {
+        font-family: 'Montserrat', sans-serif;
+        font-size: 1em;
+        padding: .25em .5rem;
+    }
+</style>
+
+
+<script>
+
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const webservice = "https://pagos.barcelo.edu.ar/backend_fa/ws_formassembly.php";
+
+
+        const input_tfa419 = document.getElementById("tfa_419");
+        let id_persona = input_tfa419.value;
+
+        // Input COD SEDE
+        const input_tfa198 = document.getElementById("tfa_198");
+        const input_tfa198_d = document.getElementById("tfa_198-D");
+
+        // Input SEDE
+        const input_tfa529 = document.getElementById("tfa_529");
+
+        // input año materia seleccionada
+        const input_tfa527 = document.getElementById("tfa_527");
+
+        const input_tfa531 = document.getElementById("tfa_531");
+        const input_tfa533 = document.getElementById("tfa_533");
+        const input_tfa537 = document.getElementById("tfa_537");
+
+        /*-------------- CARRERA ELEGIDA --------------*/
+
+        /******* CARRERA - INPUT TFA316 *******/
+
+        const input_tfa316 = document.getElementById("tfa_316");
+        const input_tfa316_d = document.getElementById("tfa_316-D");
+        const select_tfa316 = document.createElement('select');
+        const input_tfa519 = document.getElementById("tfa_519");
+        const input_tfa521 = document.getElementById("tfa_521");
+        const input_tfa553 = document.getElementById("tfa_553");
+
+        if (input_tfa316.value == "") {
+
+            let firstOption_tfa316 = document.createElement('option');
+            firstOption_tfa316.textContent = "Selecciona por favor";
+            firstOption_tfa316.value = '';
+            firstOption_tfa316.disabled = true;
+            firstOption_tfa316.selected = true;
+            select_tfa316.appendChild(firstOption_tfa316);
+
+            //contenedorSelect("Sede", select_tfa316, input_tfa316_d);
+
+            let urlWsProgPersona = webservice + "?ws_name=progPersona&id_persona=" + id_persona;
+
+            fetch(urlWsProgPersona, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            })
+                .then(response => response.json())
+                .then(data => {
+                    // Agrega las opciones al select
+                    let cantCarreras = data.length;
+
+
+                    data.forEach(function (d) {
+                        let option = document.createElement('option');
+
+                        option.textContent = d["PROGRAMA"];
+                        option.value = d["CODPROGRAMA"];
+                        option.setAttribute("data-sede", d["SEDE"]);
+                        option.setAttribute("data-codsede", d["C_SEDE"]);
+                        option.setAttribute("data-ano", d["ANO_CURSADA"]);
+                        option.setAttribute("data-modalidad", d["MODALIDAD"]);
+                        option.setAttribute("data-saleforce", d["N_ID_SALESFORCE_PROG_ALU"]);
+                        select_tfa316.appendChild(option);
+                    });
+
+
+                    contenedorSelect("Carrera", select_tfa316, input_tfa316_d, input_tfa316);
+
+                    if (cantCarreras == 1) {
+                        select_tfa316.value = data[0]["CODPROGRAMA"];
+                        input_tfa316.value = data[0]["CODPROGRAMA"];
+                        input_tfa198.value = data[0]["C_SEDE"];
+                        input_tfa529.value = data[0]["SEDE"];
+                        input_tfa519.value = data[0]["ANO_CURSADA"];
+                        input_tfa521.value = data[0]["MODALIDAD"];
+                        input_tfa553.value = data[0]["N_ID_SALESFORCE_PROG_ALU"];
+
+                        const event = new Event('change', { bubbles: true });
+                        select_tfa316.dispatchEvent(event);
+
+                    } else {
+                        select_tfa316.selectedIndex = 1;
+                        const event = new Event('change', { bubbles: true });
+                        select_tfa316.dispatchEvent(event);
+                    }
+
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+
+            // Escucha el evento change en el select
+            select_tfa316.addEventListener('change', function () {
+                // Actualiza el valor del input hidden con el valor seleccionado del select
+                let selectedIndex = this.selectedIndex;
+                let selectedText = this.options[selectedIndex].text;
+                let selectedValue = this.value;
+                let selectedCodSede = this.options[selectedIndex].dataset.codsede;
+                let selectedSede = this.options[selectedIndex].dataset.sede;
+                let selectedAnoCursada = this.options[selectedIndex].dataset.ano;
+                let selectedModalidad = this.options[selectedIndex].dataset.modalidad;
+                let selectedSaleforce = this.options[selectedIndex].dataset.saleforce;
+
+                if (selectedText == "Selecciona por favor") {
+                    input_tfa316.value = "";
+                    input_tfa198.value = "";
+                    input_tfa529.value = "";
+                    input_tfa519.value = "";
+                    input_tfa521.value = "";
+                    input_tfa553.value = "";
+                } else {
+                    input_tfa316.value = selectedValue;
+                    input_tfa198.value = selectedCodSede;
+                    input_tfa529.value = selectedSede;
+                    input_tfa519.value = selectedAnoCursada;
+                    input_tfa521.value = selectedModalidad;
+                    input_tfa553.value = selectedSaleforce;
+                }
+            });
+        }
+
+        /******* FIN CARRERA - INPUT TFA316 *******/
+
+
+
+        /******* TIPO CASO - INPUT TFA422 *******/
+
+        const input_tfa554 = document.getElementById("tfa_554");
+        const input_tfa422 = document.getElementById("tfa_422");
+        const input_tfa422_d = document.getElementById("tfa_422-D");
+        const select_tfa422 = document.createElement('select');
+
+        if (input_tfa422.value == "") {
+
+            let firstOption_tfa422 = document.createElement('option');
+            firstOption_tfa422.textContent = "Selecciona por favor";
+            firstOption_tfa422.value = '';
+            firstOption_tfa422.disabled = true;
+            firstOption_tfa422.selected = true;
+            select_tfa422.appendChild(firstOption_tfa422);
+
+            contenedorSelect("Tipo de Trámite/Consulta", select_tfa422, input_tfa422_d, input_tfa422);
+
+            select_tfa316.addEventListener("change", function () {
+
+                // Restablesco inputs ocultos
+                input_tfa422.value = "";
+                input_tfa554.value = "";
+
+                input_tfa214.value = "";
+                input_tfa457.value = "";
+                input_tfa423.value = "";
+
+                select_tfa423.innerHTML = '<option value="" disabled selected>Selecciona por favor</option>';
+
+
+
+                let urlWsTipoCaso = webservice + "?ws_name=tipoCaso&sede=" + input_tfa198.value;
+
+                fetch(urlWsTipoCaso, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                })
+                    .then(response => response.json())
+                    .then(data => {
+
+                        select_tfa422.innerHTML = "";
+
+                        let firstOption_tfa422 = document.createElement('option');
+                        firstOption_tfa422.textContent = "Selecciona por favor";
+                        firstOption_tfa422.value = '';
+                        firstOption_tfa422.disabled = true;
+                        firstOption_tfa422.selected = true;
+                        select_tfa422.appendChild(firstOption_tfa422);
+
+                        // Agrega las opciones al select
+                        data.forEach(function (d) {
+                            let option = document.createElement('option');
+                            option.textContent = d["TIPO_CASO"];
+                            option.value = d["C_TIPO_CASO"];
+                            //option.classList.add(d["SF_ID_PROVINCIA"]);
+                            select_tfa422.appendChild(option);
+                        });
+
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+            })
+
+            // Escucha el evento change en el select
+            select_tfa422.addEventListener('change', function () {
+                // Actualiza el valor del input hidden con el valor seleccionado del select
+                let selectedIndex = this.selectedIndex;
+                let selectedText = this.options[selectedIndex].text;
+                let selectedValue = this.value;
+                //let selectIdSaleforce = this.options[selectedIndex].className;
+
+                input_tfa422.value = selectedValue;
+                input_tfa554.value = selectedText;
+
+                let input_tfa461_fa = document.getElementById('tfa_461-fa');
+                input_tfa461_fa.classList.add('offstate');
+
+                let input_tfa469_fa = document.getElementById('tfa_469-fa');
+                input_tfa469_fa.classList.add('offstate');
+
+                let input_tfa471_fa = document.getElementById('tfa_471-fa');
+                input_tfa471_fa.classList.add('offstate');
+
+                let input_tfa515_fa = document.getElementById('tfa_515-fa');
+                input_tfa515_fa.classList.add('offstate');
+
+                let input_tfa505_fa = document.getElementById('tfa_505-fa');
+                input_tfa505_fa.classList.add('offstate');
+
+                let input_tfa517_fa = document.getElementById('tfa_517-fa');
+                input_tfa517_fa.classList.add('offstate');
+
+                let input_tfa513_fa = document.getElementById('tfa_513-fa');
+                input_tfa513_fa.classList.add('offstate');
+
+                input_tfa531.value = "";
+                input_tfa533.value = "";
+
+            });
+        }
+
+        /******* FIN TIPO CASO - INPUT TFA422 *******/
+
+        /******* SUBTIPO CASO - INPUT TFA423 *******/
+
+        const input_tfa423 = document.getElementById("tfa_423");
+        const input_tfa423_d = document.getElementById("tfa_423-D");
+        const select_tfa423 = document.createElement('select');
+
+        const input_tfa214 = document.getElementById("tfa_214");
+        const input_tfa457 = document.getElementById("tfa_457");
+        const input_tfa457_d = document.getElementById("tfa_457-D");
+
+        if (input_tfa423.value == "") {
+
+            let firstOption_tfa423 = document.createElement('option');
+            firstOption_tfa423.textContent = "Selecciona por favor";
+            firstOption_tfa423.value = '';
+            firstOption_tfa423.disabled = true;
+            firstOption_tfa423.selected = true;
+            select_tfa423.appendChild(firstOption_tfa423);
+
+
+            contenedorSelect("Subtipo", select_tfa423, input_tfa423_d, input_tfa423);
+
+            select_tfa422.addEventListener("change", function () {
+                input_tfa423.value = "";
+                input_tfa214.value = "";
+                input_tfa457.value = "";
+                input_tfa537.value = "";
+                focusInOut(input_tfa457, input_tfa457_d);
+
+                let urlWsSubtipoCaso = webservice + "?ws_name=subtipoCaso&tipo_caso=" + input_tfa422.value + "&sede=" + input_tfa198.value + "&ipo=" + input_tfa316.value + "&nivel=" + input_tfa519.value;
+
+                fetch(urlWsSubtipoCaso, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                })
+                    .then(response => response.json())
+                    .then(data => {
+
+                        select_tfa423.innerHTML = "";
+
+                        let firstOption_tfa423 = document.createElement('option');
+                        firstOption_tfa423.textContent = "Selecciona por favor";
+                        firstOption_tfa423.value = '';
+                        firstOption_tfa423.disabled = true;
+                        firstOption_tfa423.selected = true;
+                        select_tfa423.appendChild(firstOption_tfa423);
+
+                        // Agrega las opciones al select
+                        data.forEach(function (d) {
+                            let option = document.createElement('option');
+                            option.textContent = d["SUBTIPO_SUBCASO"];
+                            option.value = d["C_SUBTIPO_CASO"];
+                            option.setAttribute("data-prioridad", d["PRIORIDAD"]);
+                            option.setAttribute("data-comportamiento", d["COMPORTAMIENTO"]);
+                            option.setAttribute("data-colasaleforce", d["ID_SALESDORCE_COLA"]);
+                            option.setAttribute("data-cola", d["D_COLA_ATENCION"]);
+                            select_tfa423.appendChild(option);
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+            })
+
+            // Escucha el evento change en el select
+            select_tfa423.addEventListener('change', function () {
+                // Actualiza el valor del input hidden con el valor seleccionado del select
+                let selectedIndex = this.selectedIndex;
+                let selectedText = this.options[selectedIndex].text;
+                let selectedValue = this.value;
+                let selectedPrioridad = this.options[selectedIndex].dataset.prioridad;
+                let selectedComportamiento = this.options[selectedIndex].dataset.comportamiento;
+                let selectedIdSaleforce = this.options[selectedIndex].dataset.colasaleforce;
+                let selectedCola = this.options[selectedIndex].dataset.cola;
+
+                input_tfa537.value = selectedComportamiento.includes("AUT") ? "TRUE" : "FALSE";
+
+                input_tfa423.value = selectedValue;
+                input_tfa214.value = selectedPrioridad;
+                input_tfa457.value = selectedComportamiento;
+                input_tfa531.value = selectedCola;
+                input_tfa533.value = selectedIdSaleforce;
+                focusInOut(input_tfa457, input_tfa457_d);
+            });
+        }
+
+        /******* FIN SUBTIPO CASO - INPUT TFA423 *******/
+
+        /******* BAJA A QUE MATERIA - INPUT TFA461 *******/
+
+        const input_tfa461 = document.getElementById("tfa_461");
+        const input_tfa461_d = document.getElementById("tfa_461-D");
+        const select_tfa461 = document.createElement('select');
+
+
+        if (input_tfa461.value == "") {
+
+            let firstOption_tfa461 = document.createElement('option');
+            firstOption_tfa461.textContent = "Selecciona por favor";
+            firstOption_tfa461.value = '';
+            firstOption_tfa461.disabled = true;
+            firstOption_tfa461.selected = true;
+            select_tfa461.appendChild(firstOption_tfa461);
+
+            select_tfa316.addEventListener("change", function () {
+
+                let urlWsMateriaPrograma = webservice + "?ws_name=materiasPrograma&ipo=" + input_tfa316.value;
+
+                fetch(urlWsMateriaPrograma, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+
+                })
+                    .then(response => response.json())
+                    .then(data => {
+
+                        // Agrega las opciones al select
+                        data.forEach(function (d) {
+                            let option = document.createElement('option');
+                            option.textContent = d["D_DESCRIP"];
+                            option.value = d["N_ID_MATERIA"];
+                            option.setAttribute("data-ano", d["ANO_CARRERA"]);
+                            select_tfa461.appendChild(option);
+                        });
+
+                        contenedorSelect("De que materia", select_tfa461, input_tfa461_d, input_tfa461);
+
+                        //const input_tfa461_fa = document.getElementById("tfa_461-D-fa");
+                        //input_tfa461_d.appendChild(input_tfa461_fa);
+
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+            })
+
+
+            // Escucha el evento change en el select
+            select_tfa461.addEventListener('change', function () {
+                // Actualiza el valor del input hidden con el valor seleccionado del select
+                let selectedIndex = this.selectedIndex;
+                let selectedText = this.options[selectedIndex].text;
+                let selectedValue = this.value;
+                let selectedAnoCursada = this.options[selectedIndex].dataset.ano;
+
+                if (selectedText == "Selecciona por favor") {
+                    input_tfa461.value = "";
+                } else {
+
+                    console.log(selectedValue);
+                    console.log(selectedAnoCursada);
+                    input_tfa461.value = selectedText;
+                    input_tfa527.value = selectedAnoCursada;
+
+                    focusInOut(input_tfa461, input_tfa461_d);
+                }
+            });
+
+
+            select_tfa423.addEventListener('change', function () {
+                let selectedValue = this.value;
+                const input_tfa461_fa = document.getElementById("tfa_461-fa");
+                const input_tfa461 = document.getElementById("tfa_461");
+
+                let dataCondition = input_tfa461.getAttribute('data-condition').replace(/`/g, "");
+
+                let dataConditionArray = dataCondition.split(",");
+
+                if (!input_tfa457.value.includes(dataConditionArray[2])) {
+                    input_tfa461_fa.classList.add("offstate");
+                    select_tfa461.setAttribute("disabled", true);
+                } else {
+                    input_tfa461_fa.classList.remove("offstate");
+                    select_tfa461.removeAttribute("disabled");
+                }
+            })
+        }
+
+        /******* FIN BAJA A QUE MATERIA - INPUT TFA461 *******/
+
+
+        /******* A QUE MATERIA MA2 - INPUT TFA505 *******/
+
+        const input_tfa505 = document.getElementById("tfa_505");
+        const input_tfa505_d = document.getElementById("tfa_505-D");
+        const select_tfa505 = document.createElement('select');
+        select_tfa505.classList.add('js-example-basic-multiple');
+        select_tfa505.setAttribute('name', 'states[]');
+        select_tfa505.setAttribute("multiple", "multiple");
+
+        if (input_tfa505.value == "") {
+
+            let firstOption_tfa505 = document.createElement('option');
+            firstOption_tfa505.textContent = "Selecciona por favor";
+            firstOption_tfa505.value = '';
+            firstOption_tfa505.disabled = true;
+            select_tfa505.appendChild(firstOption_tfa505);
+
+            select_tfa316.addEventListener("change", function () {
+
+                let urlWsMateriaPrograma = webservice + "?ws_name=materiasPrograma&ipo=" + input_tfa316.value;
+
+                fetch(urlWsMateriaPrograma, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+
+                })
+                    .then(response => response.json())
+                    .then(data => {
+
+                        // Agrega las opciones al select
+                        data.forEach(function (d) {
+                            let option = document.createElement('option');
+                            option.textContent = d["D_DESCRIP"];
+                            option.value = d["N_ID_MATERIA"];
+                            option.setAttribute("data-ano", d["ANO_CARRERA"]);
+                            select_tfa505.appendChild(option);
+                        });
+
+                        contenedorSelect("¿A que materias?", select_tfa505, input_tfa505_d, input_tfa505);
+
+                        // Inicializa Select2 después de que el select se ha insertado en el DOM
+                        $('#tfa_505-fa select').select2({
+                            placeholder: "Selecciona por favor"
+                        });
+
+                        // Agrega el evento change para actualizar el input oculto
+                        $('#tfa_505-fa select').on('change', function () {
+                            input_tfa505.value="";
+
+                            // Obtiene las opciones seleccionadas
+                            let selectedOptions = $(this).find(':selected');
+
+                            let selectedValues = [];
+                            let selectedDates = [];
+                            selectedOptions.each(function () {
+                                let value = $(this).val();
+                                let text = $(this).text();
+                                let dataAno = $(this).attr('data-ano');
+                                //selectedDates.push("(" + value + ")" + text + "-" + dataAno + "-");
+                                selectedDates.push(text);
+                                selectedValues.push(JSON.stringify(selectedDates).replace(/[[\]]/g, '').replace(/"/g, ''));
+
+                            });
+
+                            console.log(selectedDates); // Muestra los detalles en la consola
+
+                            // Si no hay valores seleccionados, asegúrate de que el input está vacío
+                            if (selectedValues.length === 0) {
+                                input_tfa505.value = "";
+                            } else {
+                                // Actualiza el input oculto con los valores seleccionados separados por comas
+                                input_tfa505.value = selectedValues.join(',');
+                            }
+                        });
+
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+            })
+
+            // Escucha el evento change en el select nativo (si no se usa Select2)
+            select_tfa505.addEventListener('change', function () {
+                // Actualiza el valor del input hidden con el valor seleccionado del select
+                let selectedValues = Array.from(select_tfa505.selectedOptions).map(option => option.value);
+                input_tfa505.value = selectedValues.join(',');
+                console.log('evento ma2');
+            });
+
+
+            select_tfa423.addEventListener('change', function () {
+                let selectedValue = this.value;
+                const input_tfa505_fa = document.getElementById("tfa_505-fa");
+                const input_tfa505 = document.getElementById("tfa_505");
+
+                let dataCondition = input_tfa505.getAttribute('data-condition').replace(/`/g, "");
+
+                let dataConditionArray = dataCondition.split(",");
+
+                if (!input_tfa457.value.includes(dataConditionArray[2])) {
+                    input_tfa505_fa.classList.add("offstate");
+                    select_tfa505.setAttribute("disabled", true);
+                } else {
+                    input_tfa505_fa.classList.remove("offstate");
+                    select_tfa505.removeAttribute("disabled");
+                }
+            })
+        }
+
+        /******* FIN A QUE MATERIA MA2 - INPUT TFA505 *******/
+
+
+
+        /******* MOTIVO DEL PEDIDO MOP - INPUT TFA513 *******/
+
+        const input_tfa513 = document.getElementById("tfa_513");
+        const input_tfa513_d = document.getElementById("tfa_513-D");
+        const select_tfa513 = document.createElement('select');
+
+        if (input_tfa513.value == "") {
+
+            let firstOption_tfa513 = document.createElement('option');
+            firstOption_tfa513.textContent = "Selecciona por favor";
+            firstOption_tfa513.value = '';
+            firstOption_tfa513.disabled = true;
+            firstOption_tfa513.selected = true;
+            select_tfa513.appendChild(firstOption_tfa513);
+
+            select_tfa316.addEventListener("change", function () {
+
+                let urlWsMotivoPase = webservice + "?ws_name=motivosPase";
+
+                fetch(urlWsMotivoPase, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+
+                })
+                    .then(response => response.json())
+                    .then(data => {
+
+                        // Agrega las opciones al select
+                        data.forEach(function (d) {
+                            let option = document.createElement('option');
+                            option.textContent = d["MOTIVO_PASE"];
+                            option.value = d["MOTIVO_PASE"];
+                            //option.setAttribute("data-ano", d["ANO_CARRERA"]);
+                            select_tfa513.appendChild(option);
+                        });
+
+                        contenedorSelect("Motivo del pedido", select_tfa513, input_tfa513_d, input_tfa513);
+
+                        //const input_tfa513_fa = document.getElementById("tfa_513-D-fa");
+                        //input_tfa513_d.appendChild(input_tfa513_fa);
+
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+            })
+
+
+            // Escucha el evento change en el select
+            select_tfa513.addEventListener('change', function () {
+                // Actualiza el valor del input hidden con el valor seleccionado del select
+                let selectedIndex = this.selectedIndex;
+                let selectedText = this.options[selectedIndex].text;
+                let selectedValue = this.value;
+
+                if (selectedText == "Selecciona por favor") {
+                    input_tfa513.value = "";
+                } else {
+                    input_tfa513.value = selectedValue;
+
+                    focusInOut(input_tfa513, input_tfa513_d);
+                }
+            });
+
+
+            select_tfa423.addEventListener('change', function () {
+                let selectedValue = this.value;
+                const input_tfa513_fa = document.getElementById("tfa_513-fa");
+                const input_tfa513 = document.getElementById("tfa_513");
+
+                let dataCondition = input_tfa513.getAttribute('data-condition').replace(/`/g, "");
+
+                let dataConditionArray = dataCondition.split(",");
+
+                if (!input_tfa457.value.includes(dataConditionArray[2])) {
+                    input_tfa513_fa.classList.add("offstate");
+                    select_tfa513.setAttribute("disabled", true);
+                } else {
+                    input_tfa513_fa.classList.remove("offstate");
+                    select_tfa513.removeAttribute("disabled");
+                }
+            })
+        }
+
+        /******* FIN MOTIVO DEL PEDIDO MOP - INPUT TFA513 *******/
+
+        /******* PROFESIONAL PSICOLOGICO - INPUT TFA515 *******/
+
+        const input_tfa515 = document.getElementById("tfa_515");
+        const input_tfa515_d = document.getElementById("tfa_515-D");
+        const select_tfa515 = document.createElement('select');
+
+        if (input_tfa515.value == "") {
+
+            let firstOption_tfa515 = document.createElement('option');
+            firstOption_tfa515.textContent = "Selecciona por favor";
+            firstOption_tfa515.value = '';
+            firstOption_tfa515.disabled = true;
+            firstOption_tfa515.selected = true;
+            select_tfa515.appendChild(firstOption_tfa515);
+
+            select_tfa316.addEventListener("change", function () {
+
+                let urlWsProfesionalPsico = webservice + "?ws_name=profesionalesPsico";
+
+                fetch(urlWsProfesionalPsico, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+
+                })
+                    .then(response => response.json())
+                    .then(data => {
+
+                        // Agrega las opciones al select
+                        data.forEach(function (d) {
+                            let option = document.createElement('option');
+                            option.textContent = d["PROFESIONAL"];
+                            option.value = d["PROFESIONAL"];
+                            //option.setAttribute("data-ano", d["ANO_CARRERA"]);
+                            select_tfa515.appendChild(option);
+                        });
+
+                        contenedorSelect("Selecciona el profesional y rango horario", select_tfa515, input_tfa515_d, input_tfa515);
+
+                        //const input_tfa515_fa = document.getElementById("tfa_515-D-fa");
+                        //input_tfa515_d.appendChild(input_tfa515_fa);
+
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+            })
+
+
+            // Escucha el evento change en el select
+            select_tfa515.addEventListener('change', function () {
+                // Actualiza el valor del input hidden con el valor seleccionado del select
+                let selectedIndex = this.selectedIndex;
+                let selectedText = this.options[selectedIndex].text;
+                let selectedValue = this.value;
+
+                if (selectedText == "Selecciona por favor") {
+                    input_tfa515.value = "";
+                } else {
+                    input_tfa515.value = selectedValue;
+
+                    focusInOut(input_tfa515, input_tfa515_d);
+                }
+            });
+
+
+            select_tfa423.addEventListener('change', function () {
+                let selectedValue = this.value;
+                const input_tfa515_fa = document.getElementById("tfa_515-fa");
+                const input_tfa515 = document.getElementById("tfa_515");
+
+                let dataCondition = input_tfa515.getAttribute('data-condition').replace(/`/g, "");
+
+                let dataConditionArray = dataCondition.split(",");
+
+                if (!input_tfa457.value.includes(dataConditionArray[2])) {
+                    input_tfa515_fa.classList.add("offstate");
+                    select_tfa515.setAttribute("disabled", true);
+                } else {
+                    input_tfa515_fa.classList.remove("offstate");
+                    select_tfa515.removeAttribute("disabled");
+                }
+            })
+        }
+
+        /******* FIN PROFESIONAL PSICOLOGICO - INPUT TFA515 *******/
+
+        /******* MATERIA INTERNADO ROTATORIO - INPUT TFA517 *******/
+
+        const input_tfa517 = document.getElementById("tfa_517");
+        const input_tfa517_d = document.getElementById("tfa_517-D");
+        const select_tfa517 = document.createElement('select');
+
+        if (input_tfa517.value == "") {
+
+            let firstOption_tfa517 = document.createElement('option');
+            firstOption_tfa517.textContent = "Selecciona por favor";
+            firstOption_tfa517.value = '';
+            firstOption_tfa517.disabled = true;
+            firstOption_tfa517.selected = true;
+            select_tfa517.appendChild(firstOption_tfa517);
+
+            select_tfa316.addEventListener("change", function () {
+
+                let urlWsMateriaIntRotatorio = webservice + "?ws_name=materiasIntRotatorio&ipo=" + input_tfa316.value;
+
+                fetch(urlWsMateriaIntRotatorio, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+
+                })
+                    .then(response => response.json())
+                    .then(data => {
+
+                        // Agrega las opciones al select
+                        data.forEach(function (d) {
+                            let option = document.createElement('option');
+                            option.textContent = d["D_DESCRIP"];
+                            option.value = d["N_ID_MATERIA"];
+                            //option.setAttribute("data-ano", d["ANO_CARRERA"]);
+                            select_tfa517.appendChild(option);
+                        });
+
+                        contenedorSelect("¿A que materia?", select_tfa517, input_tfa517_d, input_tfa517);
+
+                        //const input_tfa517_fa = document.getElementById("tfa_517-D-fa");
+                        //input_tfa517_d.appendChild(input_tfa517_fa);
+
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+            })
+
+
+            // Escucha el evento change en el select
+            select_tfa517.addEventListener('change', function () {
+                // Actualiza el valor del input hidden con el valor seleccionado del select
+                let selectedIndex = this.selectedIndex;
+                let selectedText = this.options[selectedIndex].text;
+                let selectedValue = this.value;
+
+                if (selectedText == "Selecciona por favor") {
+                    input_tfa517.value = "";
+                } else {
+                    input_tfa517.value = selectedText;
+
+                    focusInOut(input_tfa517, input_tfa517_d);
+                }
+            });
+
+
+            select_tfa423.addEventListener('change', function () {
+                let selectedValue = this.value;
+                const input_tfa517_fa = document.getElementById("tfa_517-fa");
+                const input_tfa517 = document.getElementById("tfa_517");
+
+                let dataCondition = input_tfa517.getAttribute('data-condition').replace(/`/g, "");
+
+                let dataConditionArray = dataCondition.split(",");
+
+                if (!input_tfa457.value.includes(dataConditionArray[2])) {
+                    input_tfa517_fa.classList.add("offstate");
+                    select_tfa517.setAttribute("disabled", true);
+                } else {
+                    input_tfa517_fa.classList.remove("offstate");
+                    select_tfa517.removeAttribute("disabled");
+                }
+            })
+        }
+
+        /******* FIN MATERIA INTERNADO ROTATORIO - INPUT TFA517 *******/
+
+        /******* A QUE CARRERA CAC REINCORPO - INPUT TFA511 *******/
+
+        const input_tfa511 = document.getElementById("tfa_511");
+        const input_tfa511_d = document.getElementById("tfa_511-D");
+        const select_tfa511 = document.createElement('select');
+
+        if (input_tfa511.value == "") {
+
+            let firstOption_tfa511 = document.createElement('option');
+            firstOption_tfa511.textContent = "Selecciona por favor";
+            firstOption_tfa511.value = '';
+            firstOption_tfa511.disabled = true;
+            firstOption_tfa511.selected = true;
+            select_tfa511.appendChild(firstOption_tfa511);
+
+            select_tfa316.addEventListener("change", function () {
+
+                let urlWsReincorpoPersona = webservice + "?ws_name=reincorpoPersona&id_persona=" + id_persona + "&dias=0";
+
+                fetch(urlWsReincorpoPersona, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+
+                })
+                    .then(response => response.json())
+                    .then(data => {
+
+                        // Agrega las opciones al select
+                        data.forEach(function (d) {
+                            let option = document.createElement('option');
+                            option.textContent = d["PROGRAMA"];
+                            option.value = d["N_ID_SALESFORCE_PROG_ALU"];
+                            //option.setAttribute("data-ano", d["ANO_CARRERA"]);
+                            select_tfa511.appendChild(option);
+                        });
+
+                        contenedorSelect("¿A que carrera?", select_tfa511, input_tfa511_d, input_tfa511);
+
+                        //const input_tfa511_fa = document.getElementById("tfa_511-D-fa");
+                        //input_tfa511_d.appendChild(input_tfa511_fa);
+
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+            })
+
+
+            // Escucha el evento change en el select
+            select_tfa511.addEventListener('change', function () {
+                // Actualiza el valor del input hidden con el valor seleccionado del select
+                let selectedIndex = this.selectedIndex;
+                let selectedText = this.options[selectedIndex].text;
+                let selectedValue = this.value;
+
+                if (selectedText == "Selecciona por favor") {
+                    input_tfa511.value = "";
+                } else {
+                    input_tfa511.value = selectedValue;
+
+                    focusInOut(input_tfa511, input_tfa511_d);
+                }
+            });
+
+
+            select_tfa423.addEventListener('change', function () {
+                let selectedValue = this.value;
+                const input_tfa511_fa = document.getElementById("tfa_511-fa");
+                const input_tfa511 = document.getElementById("tfa_511");
+
+                let dataCondition = input_tfa511.getAttribute('data-condition').replace(/`/g, "");
+
+                let dataConditionArray = dataCondition.split(",");
+
+                if (!input_tfa457.value.includes(dataConditionArray[2])) {
+                    input_tfa511_fa.classList.add("offstate");
+                    select_tfa511.setAttribute("disabled", true);
+                } else {
+                    input_tfa511_fa.classList.remove("offstate");
+                    select_tfa511.removeAttribute("disabled");
+                }
+            })
+        }
+
+        /******* FIN A QUE CARRERA CAC REINCORPO - INPUT TFA511 *******/
+
+
+        /******* CAMBIO SEDE - INPUT TFA471 *******/
+
+        const input_tfa471 = document.getElementById("tfa_471");
+        const input_tfa471_d = document.getElementById("tfa_471-D");
+        const select_tfa471 = document.createElement('select');
+
+        if (input_tfa471.value == "") {
+
+            let firstOption_tfa471 = document.createElement('option');
+            firstOption_tfa471.textContent = "Selecciona por favor";
+            firstOption_tfa471.value = '';
+            firstOption_tfa471.disabled = true;
+            firstOption_tfa471.selected = true;
+            select_tfa471.appendChild(firstOption_tfa471);
+
+            select_tfa316.addEventListener("change", function () {
+
+                let urlWsSedes = webservice + "?ws_name=sedes&sede=" + input_tfa198.value;
+
+                fetch(urlWsSedes, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+
+                })
+                    .then(response => response.json())
+                    .then(data => {
+
+                        // Agrega las opciones al select
+                        data.forEach(function (d) {
+                            let option = document.createElement('option');
+                            option.textContent = d["SEDE"];
+                            option.value = d["C_SEDE"];
+                            //option.setAttribute("data-ano", d["ANO_CARRERA"]);
+                            select_tfa471.appendChild(option);
+                        });
+
+                        contenedorSelect("Sede ", select_tfa471, input_tfa471_d, input_tfa471);
+
+                        //const input_tfa471_fa = document.getElementById("tfa_471-D-fa");
+                        //input_tfa471_d.appendChild(input_tfa471_fa);
+
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+            })
+
+
+            // Escucha el evento change en el select
+            select_tfa471.addEventListener('change', function () {
+                // Actualiza el valor del input hidden con el valor seleccionado del select
+                let selectedIndex = this.selectedIndex;
+                let selectedText = this.options[selectedIndex].text;
+                let selectedValue = this.value;
+
+                if (selectedText == "Selecciona por favor") {
+                    input_tfa471.value = "";
+                } else {
+                    input_tfa471.value = selectedValue;
+
+                    focusInOut(input_tfa471, input_tfa471_d);
+                }
+            });
+
+
+            select_tfa423.addEventListener('change', function () {
+                let selectedValue = this.value;
+                const input_tfa471_fa = document.getElementById("tfa_471-fa");
+                const input_tfa471 = document.getElementById("tfa_471");
+
+                let dataCondition = input_tfa471.getAttribute('data-condition').replace(/`/g, "");
+
+                let dataConditionArray = dataCondition.split(",");
+
+                if (!input_tfa457.value.includes(dataConditionArray[2])) {
+                    input_tfa471_fa.classList.add("offstate");
+                    select_tfa471.setAttribute("disabled", true);
+                } else {
+                    input_tfa471_fa.classList.remove("offstate");
+                    select_tfa471.removeAttribute("disabled");
+                }
+            })
+        }
+
+        /******* FIN CAMBIO SEDE - INPUT TFA471 *******/
+
+        /******* CAMBIO MODALIDAD - INPUT TFA469 *******/
+
+        const input_tfa469 = document.getElementById("tfa_469");
+        const input_tfa469_d = document.getElementById("tfa_469-D");
+        const select_tfa469 = document.createElement('select');
+
+        if (input_tfa469.value == "") {
+
+            let firstOption_tfa469 = document.createElement('option');
+            firstOption_tfa469.textContent = "Selecciona por favor";
+            firstOption_tfa469.value = '';
+            firstOption_tfa469.disabled = true;
+            firstOption_tfa469.selected = true;
+            select_tfa469.appendChild(firstOption_tfa469);
+
+            select_tfa316.addEventListener("change", function () {
+
+                let urlWsSedes = webservice + "?ws_name=modalidad";
+
+                fetch(urlWsSedes, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+
+                })
+                    .then(response => response.json())
+                    .then(data => {
+
+                        // Agrega las opciones al select
+                        data.forEach(function (d) {
+                            let option = document.createElement('option');
+                            option.textContent = d["DESCRIPCION"];
+                            option.value = d["C_MODALIDAD"];
+                            //option.setAttribute("data-ano", d["ANO_CARRERA"]);
+                            select_tfa469.appendChild(option);
+                        });
+
+                        contenedorSelect("Cambio modalidad", select_tfa469, input_tfa469_d, input_tfa469);
+
+                        //const input_tfa469_fa = document.getElementById("tfa_469-D-fa");
+                        //input_tfa469_d.appendChild(input_tfa469_fa);
+
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+            })
+
+
+            // Escucha el evento change en el select
+            select_tfa469.addEventListener('change', function () {
+                // Actualiza el valor del input hidden con el valor seleccionado del select
+                let selectedIndex = this.selectedIndex;
+                let selectedText = this.options[selectedIndex].text;
+                let selectedValue = this.value;
+
+                if (selectedText == "Selecciona por favor") {
+                    input_tfa469.value = "";
+                } else {
+                    input_tfa469.value = selectedValue;
+
+                    focusInOut(input_tfa469, input_tfa469_d);
+                }
+            });
+
+
+            select_tfa423.addEventListener('change', function () {
+                let selectedValue = this.value;
+                const input_tfa469_fa = document.getElementById("tfa_469-fa");
+                const input_tfa469 = document.getElementById("tfa_469");
+
+                let dataCondition = input_tfa469.getAttribute('data-condition').replace(/`/g, "");
+
+                let dataConditionArray = dataCondition.split(",");
+
+                if (!input_tfa457.value.includes(dataConditionArray[2])) {
+                    input_tfa469_fa.classList.add("offstate");
+                    select_tfa469.setAttribute("disabled", true);
+                } else {
+                    input_tfa469_fa.classList.remove("offstate");
+                    select_tfa469.removeAttribute("disabled");
+                }
+            })
+        }
+
+        /******* FIN CAMBIO MODALIDAD - INPUT TFA469 *******/
+
+
+        /******* PAÍS - INPUT TFA490 *******/
+
+        const input_tfa490 = document.getElementById("tfa_490");
+        const input_tfa490_d = document.getElementById("tfa_490-D");
+        const select_tfa490 = document.createElement('select');
+
+        if (input_tfa490.value == "") {
+
+            let firstOption_tfa490 = document.createElement('option');
+            firstOption_tfa490.textContent = "Selecciona por favor";
+            select_tfa490.appendChild(firstOption_tfa490);
+
+            let urlWsPaises = webservice + "?ws_name=paises";
+
+            fetch(urlWsPaises, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            })
+                .then(response => response.json())
+                .then(data => {
+                    // Agrega las opciones al select
+                    data.forEach(function (d) {
+                        let option = document.createElement('option');
+                        option.textContent = d["D_PAIS"];
+                        option.value = d["N_ID_PAIS"];
+                        option.classList.add(d["SF_ID_PAIS"]);
+                        select_tfa490.appendChild(option);
+                    });
+
+                    contenedorSelect("País", select_tfa490, input_tfa490_d, input_tfa490);
+
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+
+            // Escucha el evento change en el select
+            select_tfa490.addEventListener('change', function () {
+                // Actualiza el valor del input hidden con el valor seleccionado del select
+                let selectedIndex = this.selectedIndex;
+                let selectedText = this.options[selectedIndex].text;
+                let selectedValue = this.value;
+                let selectIdSaleforce = this.options[selectedIndex].className;
+
+                if (selectedText == "Selecciona por favor") {
+                    input_tfa490.value = "";
+                } else {
+                    input_tfa490.value = selectIdSaleforce;
+                }
+            });
+
+            select_tfa423.addEventListener('change', function () {
+                let selectedValue = this.value;
+                const input_tfa490_fa = document.getElementById("tfa_490-fa");
+                const input_tfa490 = document.getElementById("tfa_490");
+
+                let dataCondition = input_tfa490.getAttribute('data-condition').replace(/`/g, "");
+
+                let dataConditionArray = dataCondition.split(",");
+
+                if (!input_tfa457.value.includes(dataConditionArray[2])) {
+                    input_tfa490_fa.classList.add("offstate");
+                    select_tfa490.setAttribute("disabled", true);
+                } else {
+                    input_tfa490_fa.classList.remove("offstate");
+                    select_tfa490.removeAttribute("disabled");
+                }
+            })
+        }
+
+        /******* FIN PAÍS - INPUT TFA490 *******/
+
+
+        /******* EDIFICIOS - INPUT TFA539 *******/
+
+        const input_tfa539 = document.getElementById("tfa_539");
+        const input_tfa539_d = document.getElementById("tfa_539-D");
+        const select_tfa539 = document.createElement('select');
+
+        if (input_tfa539.value == "") {
+
+            let firstOption_tfa539 = document.createElement('option');
+            firstOption_tfa539.textContent = "Selecciona por favor";
+            select_tfa539.appendChild(firstOption_tfa539);
+
+            let urlWsPaises = webservice + "?ws_name=edificios";
+
+            fetch(urlWsPaises, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            })
+                .then(response => response.json())
+                .then(data => {
+                    // Agrega las opciones al select
+                    data.forEach(function (d) {
+                        let option = document.createElement('option');
+                        option.textContent = d["EDIFICIO"];
+                        option.value = d["EDIFICIO"];
+                        select_tfa539.appendChild(option);
+                    });
+
+                    contenedorSelect("Edificio", select_tfa539, input_tfa539_d, input_tfa539);
+
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+
+            // Escucha el evento change en el select
+            select_tfa539.addEventListener('change', function () {
+                // Actualiza el valor del input hidden con el valor seleccionado del select
+                let selectedIndex = this.selectedIndex;
+                let selectedText = this.options[selectedIndex].text;
+                let selectedValue = this.value;
+
+                if (selectedText == "Selecciona por favor") {
+                    input_tfa539.value = "";
+                } else {
+                    input_tfa539.value = selectedValue;
+                }
+            });
+
+            select_tfa423.addEventListener('change', function () {
+                let selectedValue = this.value;
+                const input_tfa539_fa = document.getElementById("tfa_539-fa");
+                const input_tfa539 = document.getElementById("tfa_539");
+
+                let dataCondition = input_tfa539.getAttribute('data-condition').replace(/`/g, "");
+
+                let dataConditionArray = dataCondition.split(",");
+
+                if (!input_tfa457.value.includes(dataConditionArray[2])) {
+                    input_tfa539_fa.classList.add("offstate");
+                    select_tfa539.setAttribute("disabled", true);
+                } else {
+                    input_tfa539_fa.classList.remove("offstate");
+                    select_tfa539.removeAttribute("disabled");
+                }
+            })
+        }
+
+        /******* FIN EDIFICIOS - INPUT TFA539 *******/
+
+
+
+        /******* CARRERAS DE GRADO - INPUT TFA535 *******/
+
+        const input_tfa535 = document.getElementById("tfa_535");
+        const input_tfa535_d = document.getElementById("tfa_535-D");
+        const select_tfa535 = document.createElement('select');
+
+        if (input_tfa535.value == "") {
+
+            let firstOption_tfa535 = document.createElement('option');
+            firstOption_tfa535.textContent = "Selecciona por favor";
+            firstOption_tfa535.value = '';
+            firstOption_tfa535.disabled = true;
+            firstOption_tfa535.selected = true;
+            select_tfa535.appendChild(firstOption_tfa535);
+
+            //contenedorSelect("¿A que carrera?", select_tfa535, input_tfa535_d, input_tfa535);
+
+            let urlWsProgramasCasos = webservice + "?ws_name=programasCasos";
+
+            fetch(urlWsProgramasCasos, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+
+            })
+                .then(response => response.json())
+                .then(data => {
+
+                    // Agrega las opciones al select
+                    data.forEach(function (d) {
+                        let option = document.createElement('option');
+                        option.textContent = d["PROGRAMA"];
+                        option.value = d["N_ID_SALESFORCE_PROG"];
+                        //option.setAttribute("data-ano", d["ANO_CARRERA"]);
+                        select_tfa535.appendChild(option);
+                    });
+
+                    contenedorSelect("¿A que carrera?", select_tfa535, input_tfa535_d, input_tfa535);
+
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+
+
+            // Escucha el evento change en el select
+            select_tfa535.addEventListener('change', function () {
+                // Actualiza el valor del input hidden con el valor seleccionado del select
+                let selectedIndex = this.selectedIndex;
+                let selectedText = this.options[selectedIndex].text;
+                let selectedValue = this.value;
+
+                if (selectedText == "Selecciona por favor") {
+                    input_tfa535.value = "";
+                } else {
+                    input_tfa535.value = selectedValue;
+
+                    //focusInOut(input_tfa535, input_tfa535_d);
+                }
+            });
+
+
+            select_tfa423.addEventListener('change', function () {
+                let selectedValue = this.value;
+                const input_tfa535_fa = document.getElementById("tfa_535-fa");
+                const input_tfa535 = document.getElementById("tfa_535");
+
+                let dataCondition = input_tfa535.getAttribute('data-condition').replace(/`/g, "");
+
+                let dataConditionArray = dataCondition.split(",");
+
+                if (!input_tfa457.value.includes(dataConditionArray[2])) {
+                    input_tfa535_fa.classList.add("offstate");
+                    select_tfa535.setAttribute("disabled", true);
+                } else {
+                    input_tfa535_fa.classList.remove("offstate");
+                    select_tfa535.removeAttribute("disabled");
+                }
+            })
+
+        }
+
+        /******* FIN CARRERAS DE GRADO - INPUT TFA535 *******/
+
+        /******* MATERIA SEXTO - INPUT TFA560 *******/
+        const input_tfa560 = document.getElementById("tfa_560");
+        const input_tfa560_d = document.getElementById("tfa_560-D");
+        const select_tfa560 = document.createElement('select');
+
+        if (input_tfa560.value == "") {
+
+            let firstOption_tfa560 = document.createElement('option');
+            firstOption_tfa560.textContent = "Selecciona por favor";
+            firstOption_tfa560.value = '';
+            firstOption_tfa560.disabled = true;
+            firstOption_tfa560.selected = true;
+            select_tfa560.appendChild(firstOption_tfa560);
+
+            select_tfa316.addEventListener("change", function () {
+
+                let urlWsMateriaSexto = webservice + "?ws_name=materiasSexto&ipo=" + input_tfa316.value;
+
+                fetch(urlWsMateriaSexto, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+
+                })
+                    .then(response => response.json())
+                    .then(data => {
+
+                        // Agrega las opciones al select
+                        data.forEach(function (d) {
+                            let option = document.createElement('option');
+                            option.textContent = d["D_DESCRIP"];
+                            option.value = d["N_ID_MATERIA"];
+                            option.setAttribute("data-ano", d["ANO_CARRERA"]);
+                            select_tfa560.appendChild(option);
+                        });
+
+                        contenedorSelect("¿A que materia?", select_tfa560, input_tfa560_d, input_tfa560);
+
+                        //const input_tfa560_fa = document.getElementById("tfa_560-D-fa");
+                        //input_tfa560_d.appendChild(input_tfa560_fa);
+
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+            })
+
+
+            // Escucha el evento change en el select
+            select_tfa560.addEventListener('change', function () {
+                // Actualiza el valor del input hidden con el valor seleccionado del select
+                let selectedIndex = this.selectedIndex;
+                let selectedText = this.options[selectedIndex].text;
+                let selectedValue = this.value;
+
+                if (selectedText == "Selecciona por favor") {
+                    input_tfa560.value = "";
+                } else {
+                    input_tfa560.value = selectedText;
+
+                    focusInOut(input_tfa560, input_tfa560_d);
+                }
+            });
+
+
+            select_tfa423.addEventListener('change', function () {
+                let selectedValue = this.value;
+                const input_tfa560_fa = document.getElementById("tfa_560-fa");
+                const input_tfa560 = document.getElementById("tfa_560");
+
+                let dataCondition = input_tfa560.getAttribute('data-condition').replace(/`/g, "");
+
+                let dataConditionArray = dataCondition.split(",");
+
+                if (!input_tfa457.value.includes(dataConditionArray[2])) {
+                    input_tfa560_fa.classList.add("offstate");
+                    select_tfa560.setAttribute("disabled", true);
+                } else {
+                    input_tfa560_fa.classList.remove("offstate");
+                    select_tfa560.removeAttribute("disabled");
+                }
+            })
+        }
+
+        /******* FIN MATERIAS SEXTO - INPUT TFA560 *******/
+
+        /******* TRAMITES - INPUT TFA596 *******/
+        const input_tfa596 = document.getElementById("tfa_596");
+        const input_tfa596_d = document.getElementById("tfa_596-D");
+        const select_tfa596 = document.createElement('select');
+
+        if (input_tfa596.value == "") {
+
+            let firstOption_tfa596 = document.createElement('option');
+            firstOption_tfa596.textContent = "Selecciona por favor";
+            firstOption_tfa596.value = '';
+            firstOption_tfa596.disabled = true;
+            firstOption_tfa596.selected = true;
+            select_tfa596.appendChild(firstOption_tfa596);
+
+            select_tfa316.addEventListener("change", function () {
+
+                let urlWsTramites = webservice + "?ws_name=tramites";
+
+                fetch(urlWsTramites, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+
+                })
+                    .then(response => response.json())
+                    .then(data => {
+
+                        // Agrega las opciones al select
+                        data.forEach(function (d) {
+                            let option = document.createElement('option');
+                            option.textContent = d["TRAMITE"];
+                            option.value = d["TRAMITE"];
+                            //option.setAttribute("data-ano", d["ANO_CARRERA"]);
+                            select_tfa596.appendChild(option);
+                        });
+
+                        contenedorSelect("Tipo de trámite", select_tfa596, input_tfa596_d, input_tfa596);
+
+                        //const input_tfa596_fa = document.getElementById("tfa_596-D-fa");
+                        //input_tfa596_d.appendChild(input_tfa596_fa);
+
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+            })
+
+
+            // Escucha el evento change en el select
+            select_tfa596.addEventListener('change', function () {
+                // Actualiza el valor del input hidden con el valor seleccionado del select
+                let selectedIndex = this.selectedIndex;
+                let selectedText = this.options[selectedIndex].text;
+                let selectedValue = this.value;
+
+                if (selectedText == "Selecciona por favor") {
+                    input_tfa596.value = "";
+                } else {
+                    input_tfa596.value = selectedText;
+
+                    focusInOut(input_tfa596, input_tfa596_d);
+                }
+            });
+
+
+            select_tfa423.addEventListener('change', function () {
+                let selectedValue = this.value;
+                const input_tfa596_fa = document.getElementById("tfa_596-fa");
+                const input_tfa596 = document.getElementById("tfa_596");
+
+                let dataCondition = input_tfa596.getAttribute('data-condition').replace(/`/g, "");
+
+                let dataConditionArray = dataCondition.split(",");
+
+                if (!input_tfa457.value.includes(dataConditionArray[2])) {
+                    input_tfa596_fa.classList.add("offstate");
+                    select_tfa596.setAttribute("disabled", true);
+                } else {
+                    input_tfa596_fa.classList.remove("offstate");
+                    select_tfa596.removeAttribute("disabled");
+                }
+            })
+        }
+
+        /******* FIN TRAMITES - INPUT TFA596 *******/
+
+        /******* FUNCTIONS *******/
+/*
+        function contenedorSelect(labelText, select_tfa, input_tfa, id_tfa, display) {
+            const div_content = document.createElement('div'); 7
+            let new_id = id_tfa + "-fa";
+            div_content.className = "oneField field-container-D";
+
+            if (display == "oculto") {
+                div_content.className = "oneField field-container-D diplay-none";
+            } else if (display == "offstate") {
+                div_content.className = "oneField field-container-D offstate";
+            }
+
+            div_content.setAttribute("id", new_id);
+
+            const label_select = document.createElement('label');
+            label_select.className = "label preField reqMark";
+            label_select.textContent = labelText;
+            div_content.appendChild(label_select);
+            //div_content.appendChild(document.createElement('br'));
+
+            const div_content_input = document.createElement('div');
+            div_content_input.className = "inputWrapper";
+
+            div_content_input.appendChild(select_tfa);
+            div_content.appendChild(div_content_input);
+
+            // Inserta el select después del input hidden
+            input_tfa.insertAdjacentElement('afterend', div_content);
+        }
+*/
+
+function contenedorSelect(labelText, select_tfa, input_tfa_d, input_tfa) {
+            let labelElement = document.getElementById(input_tfa.id+"-L");
+            const div_content = document.createElement('div');
+            let new_id = input_tfa.id + "-fa";
+            div_content.className = "oneField field-container-D";
+
+            const hasReqMarkClass = labelElement.classList.contains("reqMark");
+
+            const hasOffstate = input_tfa_d.classList.contains("offstate");
+
+
+            if( hasOffstate ) {
+                div_content.className = "oneField field-container-D offstate";
+            }
+
+            div_content.setAttribute("id", new_id);
+
+            const label_select = document.createElement('label');
+
+            if (hasReqMarkClass) {
+                label_select.className = "label preField reqMark";
+                select_tfa.className = "required";
+
+                input_tfa.classList.remove("required");
+            } else {
+                label_select.className = "label preField";
+            }
+
+            if( hasOffstate ){
+                select_tfa.setAttribute("disabled", true);
+            }
+
+            label_select.textContent = labelText;
+            div_content.appendChild(label_select);
+
+            const div_content_input = document.createElement('div');
+            div_content_input.className = "inputWrapper";
+
+            div_content_input.appendChild(select_tfa);
+            div_content.appendChild(div_content_input);
+
+            // Inserta el select después del input hidden
+            input_tfa_d.insertAdjacentElement('afterend', div_content);
+        }
+
+
+        function focusInOut(input, input_d) {
+            input_d.classList.remove('wf-acl-hidden');
+            input.focus();
+            input.blur();
+            input_d.classList.add('wf-acl-hidden');
+        }
+
+        function nombrePropio(texto) {
+
+            var cadena = texto.toLowerCase().split(' ');
+
+            for (var i = 0; i < cadena.length; i++) {
+                cadena[i] = cadena[i].charAt(0).toUpperCase() + cadena[i].substring(1);
+            }
+            texto = cadena.join(' ');
+
+            return texto;
+        }
+
+        /******* FIN FUNCTIONS *******/
+
+    })
+
+</script>

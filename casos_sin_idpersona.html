@@ -1,0 +1,343 @@
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<style>
+    .swal2-title {
+        font-family: 'Montserrat', sans-serif;
+    }
+
+    .display-none {
+        display: none;
+    }
+
+    #tfa_734-D>label,
+    #tfa_734-D>.inputWrapper {
+        display: none;
+    }
+
+    .select2-search textarea {
+        height: 1em !important;
+        border: none !important;
+    }
+
+    .select2-search .wFormContainer .wForm .inputWrapper textarea {
+        padding: 0 !important;
+    }
+
+
+    .wFormContainer .wForm .inputWrapper .select2-search textarea:focus {
+        border: none !important;
+    }
+
+    .select2-container--default .select2-selection--multiple,
+    .select2-container--default.select2-container--focus .select2-selection--multiple {
+        font-family: 'Montserrat', sans-serif;
+        border: 1px solid #d8dde6;
+        border-radius: 2px;
+        min-width: 20em;
+    }
+
+    .select2-container--default ul {
+        margin: 0 !important;
+    }
+
+    .select2-results__option {
+        font-family: 'Montserrat', sans-serif;
+        font-size: 1em;
+        padding: .25em .5rem;
+    }
+
+    #btn-check {
+        display: inline;
+        background-color: #4fbf53;
+    }
+
+    #btn-check:hover {
+        background-color: #47e24c;
+    }
+
+
+    .actions[data-contentid='submit_button'] {
+        display: none;
+    }
+</style>
+
+
+<script>
+    const webservice = "https://pagos.barcelo.edu.ar/backend_fa/ws_formassembly.php";
+    const input = {};
+    const actions = document.getElementsByClassName('actions');
+
+    // boton chequear
+    const btn_check = document.createElement('div');
+    const content_btn = document.createElement('div');
+
+    document.addEventListener("DOMContentLoaded", function () {
+
+
+        input.tfa1 = document.getElementById("tfa_1");  // Usuario
+        input.tfa2 = document.getElementById("tfa_2");  // Email
+        input.tfa2_d = document.getElementById("tfa_2-D");
+        input.tfa4 = document.getElementById("tfa_4");  // ID alumno
+        input.tfa6 = document.getElementById("tfa_6");  // Código programa
+        input.tfa8 = document.getElementById("tfa_8");  // Programa
+        input.tfa10 = document.getElementById("tfa_10");  // Código sede
+        input.tfa12 = document.getElementById("tfa_12"); // Sede
+        input.tfa14 = document.getElementById("tfa_14"); // Año cursada
+        input.tfa16 = document.getElementById("tfa_16"); // Modalidad
+        input.tfa18 = document.getElementById("tfa_18"); // Salesforce ID
+        input.tfa20 = document.getElementById("tfa_20"); // Tipo caso
+        input.tfa20_d = document.getElementById("tfa_20-D");
+        input.tfa22 = document.getElementById("tfa_22"); // Subtipo caso
+        input.tfa22_d = document.getElementById("tfa_22-D");
+        input.tfa24 = document.getElementById("tfa_24"); // Prioridad
+        input.tfa32 = document.getElementById("tfa_32"); // Comportamiento
+        input.tfa26 = document.getElementById("tfa_26"); // Auto responder
+        input.tfa28 = document.getElementById("tfa_28"); // Cola atención
+        input.tfa30 = document.getElementById("tfa_30");  // Cod. cola atención
+
+        /******* VALIDACIÓN USUARIO *******/
+
+        btn_check.id = 'btn-check';
+        btn_check.className = 'wFormContainer primaryAction';
+        btn_check.textContent = "Validar";
+        btn_check.setAttribute('onclick', 'validarDatos()');
+        content_btn.appendChild(btn_check);
+
+        content_btn.id = 'content-btn';
+        content_btn.className = 'actions';
+
+        input.tfa2_d.insertAdjacentElement('afterend', content_btn);
+
+        /******* FIN VALIDACIÓN USUARIO *******/
+
+        /******* SUBTIPO - INPUT TFA22 *******/
+
+        const select_tfa22 = document.createElement('select');
+        const select_tfa20 = document.createElement('select');
+
+
+        if (input.tfa22.value == "") {
+
+            let firstOption_tfa22 = document.createElement('option');
+            firstOption_tfa22.textContent = "Selecciona por favor";
+            firstOption_tfa22.value = '';
+            firstOption_tfa22.disabled = true;
+            firstOption_tfa22.selected = true;
+            select_tfa22.appendChild(firstOption_tfa22);
+
+            input.tfa20.addEventListener('change', function () {
+
+                const urlWsSubtipoCaso = `${webservice}?ws_name=subtipoCaso&tipo_caso=${input.tfa20.value}&sede=${input.tfa10.value}&ipo=${input.tfa6.value}&nivel=${input.tfa14.value}`;
+
+                fetch(urlWsSubtipoCaso, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        // Agrega las opciones al select
+                        data.forEach(function (d) {
+                            let option = document.createElement('option');
+                            option.textContent = d["SUBTIPO_SUBCASO"];
+                            option.value = d["C_SUBTIPO_CASO"];
+                            option.setAttribute("data-prioridad", d["PRIORIDAD"]);
+                            option.setAttribute("data-comportamiento", d["COMPORTAMIENTO"]);
+                            option.setAttribute("data-colasaleforce", d["ID_SALESDORCE_COLA"]);
+                            option.setAttribute("data-cola", d["D_COLA_ATENCION"]);
+                            select_tfa22.appendChild(option);
+                        });
+
+                        contenedorSelect("Subtipo", select_tfa22, input.tfa22_d, input.tfa22);
+
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+
+                // Escucha el evento change en el select
+                select_tfa22.addEventListener('change', function () {
+                    // Actualiza el valor del input hidden con el valor seleccionado del select
+                    let selectedIndex = this.selectedIndex;
+                    let selectedText = this.options[selectedIndex].text;
+                    let selectedValue = this.value;
+                    let selectedPrioridad = this.options[selectedIndex].dataset.prioridad;
+                    let selectedComportamiento = this.options[selectedIndex].dataset.comportamiento;
+                    let selectedIdSaleforce = this.options[selectedIndex].dataset.colasaleforce;
+                    let selectedCola = this.options[selectedIndex].dataset.cola;
+
+
+                    if (selectedText == "Selecciona por favor") {
+                        input.tfa22.value = "";
+                    } else {
+                        input.tfa22.value = selectedValue;
+                        input.tfa24.value = selectedPrioridad;
+                        input.tfa32.value = selectedComportamiento;
+                        input.tfa28.value = selectedCola;
+                        input.tfa30.value = selectedIdSaleforce;
+                        // Carga INPUT AUTO RESPONDER
+                        input.tfa26.value = input.tfa32.value.includes("AUT") ? "TRUE" : "FALSE";
+
+                    }
+                });
+
+                input.tfa20.addEventListener('change', function () {
+                    let selectedValue = this.value;
+                    const input_tfa22_fa = document.getElementById("tfa_22-fa");
+                    const input_tfa22 = document.getElementById("tfa_22");
+
+                    let dataCondition = input_tfa22.getAttribute('data-condition').replace(/`/g, "");
+
+                    let dataConditionArray = dataCondition.split(",");
+
+                    if (!input_tfa457.value.includes(dataConditionArray[2])) {
+                        input_tfa22_fa.classList.add("offstate");
+                        select_tfa22.setAttribute("disabled", true);
+                    } else {
+                        input_tfa22_fa.classList.remove("offstate");
+                        select_tfa22.removeAttribute("disabled");
+                    }
+                })
+            })
+
+        }
+
+        /******* FIN SUBTIPO - INPUT TFA22 *******/
+
+
+        /******* SUBMIT *******/
+        const submit_button = document.getElementById('submit_button');
+
+        submit_button.addEventListener("click", handleClick);
+
+        function handleClick(event) {
+            // Detiene el envío del formulario
+            event.preventDefault();
+
+            input.tfa1.disabled = false;
+            input.tfa2.disabled = false;
+            submit_button.removeEventListener("click", handleClick);
+            submit_button.click();
+
+        }
+
+
+        /******* FIN SUBMIT *******/
+
+
+        /******* FUNCTIONS *******/
+
+        function contenedorSelect(labelText, select_tfa, input_tfa_d, input_tfa) {
+            let labelElement = document.getElementById(input_tfa.id + "-L");
+            const div_content = document.createElement('div');
+            let new_id = input_tfa.id + "-fa";
+            div_content.className = "oneField field-container-D";
+
+            const hasReqMarkClass = labelElement.classList.contains("reqMark");
+
+            const hasOffstate = input_tfa_d.classList.contains("offstate");
+
+
+            if (hasOffstate) {
+                div_content.className = "oneField field-container-D offstate";
+            }
+
+            div_content.setAttribute("id", new_id);
+
+            const label_select = document.createElement('label');
+
+            if (hasReqMarkClass) {
+                label_select.className = "label preField reqMark";
+                select_tfa.className = "required";
+
+                input_tfa.classList.remove("required");
+            } else {
+                label_select.className = "label preField";
+            }
+
+            if (hasOffstate) {
+                select_tfa.setAttribute("disabled", true);
+            }
+
+            label_select.textContent = labelText;
+            div_content.appendChild(label_select);
+
+            const div_content_input = document.createElement('div');
+            div_content_input.className = "inputWrapper";
+
+            div_content_input.appendChild(select_tfa);
+            div_content.appendChild(div_content_input);
+
+            // Inserta el select después del input hidden
+            input_tfa_d.insertAdjacentElement('afterend', div_content);
+        }
+
+
+
+
+        /******* FIN FUNCTIONS *******/
+
+    })
+
+    function focusInOut(input, input_d) {
+        input_d.classList.remove('wf-acl-hidden');
+        input.focus();
+        input.blur();
+        input_d.classList.add('wf-acl-hidden');
+
+        const event = new Event('change', { bubbles: true });
+        input.dispatchEvent(event);
+    }
+
+    function validarDatos() {
+        let urlWsValidarUsuario = webservice + "?ws_name=validacionUsuario&usuario=" + input.tfa1.value + "&email=" + input.tfa2.value;
+
+        fetch(urlWsValidarUsuario, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        })
+            .then(response => response.json())
+            .then(data => {
+
+                console.log(data['po_c_error']);
+
+                if (data['po_c_error'] == null) {
+                    input.tfa4.value = data['po_n_id_alu_prog'];
+                    input.tfa18.value = data['po_id_salesforce_prog_alu'];
+                    input.tfa6.value = data['po_codprograma'];
+                    input.tfa8.value = data['po_programa'];
+                    input.tfa10.value = data['po_c_sede'];
+                    input.tfa12.value = data['po_d_descrip_sede'];
+                    input.tfa14.value = data['po_ano_cursada'];
+                    input.tfa16.value = data['po_modalidad_cursada'];
+
+                    input.tfa20.value = 2;
+                    focusInOut(input.tfa20, input.tfa20_d);
+
+                    input.tfa1.disabled = true;
+                    input.tfa2.disabled = true;
+
+                    actions[1].style.display = "block";
+
+                    content_btn.style.display = "none";
+
+                } else if (data['po_c_error'] == "-20001") {
+                    Swal.fire('Por favor, ingrese sus datos en los campos requeridos y presione "Validar" para continuar');
+
+                } else if (data['po_c_error'] == "-20002") {
+                    Swal.fire('Los datos ingresados, no corresponden a un alumno registrado en SIGEDU');
+
+                }
+
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    }
+
+</script>

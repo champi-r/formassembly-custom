@@ -20,6 +20,7 @@
 
         const webservice = "https://pagos.barcelo.edu.ar/backend_fa/ws_formassembly.php";
         const input_tfa699 = document.getElementById("tfa_699");
+        const input_tfa700 = document.getElementById("tfa_700");
         const input_tfa701 = document.getElementById("tfa_701");
         const input_tfa720 = document.getElementById("tfa_720");
         const input_tfa840 = document.getElementById("tfa_840");
@@ -162,7 +163,7 @@
         const input_tfa833 = document.getElementById("tfa_833");
         const input_tfa833_d = document.getElementById("tfa_833-D");
 
-        let urlWsExigenciaTurnoCursada = webservice + "?ws_name=turnoCursada&ipo=" + input_tfa701.value;
+        let urlWsExigenciaTurnoCursada = webservice + "?ws_name=turnoCursada&ipo=" + input_tfa701.value + "&sede=" + input_tfa700.value + "&calendario=" + input_tfa699.value;
 
         fetch(urlWsExigenciaTurnoCursada, {
             method: 'POST',

@@ -27,6 +27,7 @@
         const input_tfa737 = document.getElementById("tfa_737");
         const input_tfa737_d = document.getElementById("tfa_737-D");
         const select_tfa737 = document.createElement('select');
+        const input_tfa741 = document.getElementById("tfa_741");
 
         if (input_tfa737.value == "") {
             select_tfa737.className = "required";
@@ -76,6 +77,7 @@
                     input_tfa737.value = "";
                 } else {
                     input_tfa737.value = selectedValue;
+                    input_tfa741.value = selectedText;
                 }
             });
         }
@@ -1054,7 +1056,7 @@
                 if (selectedText == "Selecciona por favor") {
                     input_tfa705.value = "";
                 } else {
-                    input_tfa705.value = selectedText;
+                    input_tfa705.value = selectedValue;
                 }
             });
         }
