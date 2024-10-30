@@ -1,6 +1,6 @@
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css">
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <style>
     .swal2-title {
@@ -73,6 +73,9 @@
         const input_tfa531 = document.getElementById("tfa_531");
         const input_tfa533 = document.getElementById("tfa_533");
         const input_tfa537 = document.getElementById("tfa_537");
+        const input_tfa606 = document.getElementById("tfa_606");
+        const input_tfa608 = document.getElementById("tfa_608");
+        const input_tfa614 = document.getElementById("tfa_614");
 
         /*-------------- CARRERA ELEGIDA --------------*/
 
@@ -120,6 +123,9 @@
                         option.setAttribute("data-ano", d["ANO_CURSADA"]);
                         option.setAttribute("data-modalidad", d["MODALIDAD"]);
                         option.setAttribute("data-saleforce", d["N_ID_SALESFORCE_PROG_ALU"]);
+                        option.setAttribute("data-graduado", d["GRADUADO"]);
+                        option.setAttribute("data-homologacion", d["HOMOLOGACION"]);
+                        option.setAttribute("data-alumprog", d["N_ID_ALU_PROG"]);
                         select_tfa316.appendChild(option);
                     });
 
@@ -134,6 +140,9 @@
                         input_tfa519.value = data[0]["ANO_CURSADA"];
                         input_tfa521.value = data[0]["MODALIDAD"];
                         input_tfa553.value = data[0]["N_ID_SALESFORCE_PROG_ALU"];
+                        input_tfa606.value = data[0]["GRADUADO"];
+                        input_tfa608.value = data[0]["HOMOLOGACION"];
+                        input_tfa614.value = data[0]["N_ID_ALU_PROG"];
 
                         const event = new Event('change', { bubbles: true });
                         select_tfa316.dispatchEvent(event);
@@ -160,6 +169,9 @@
                 let selectedAnoCursada = this.options[selectedIndex].dataset.ano;
                 let selectedModalidad = this.options[selectedIndex].dataset.modalidad;
                 let selectedSaleforce = this.options[selectedIndex].dataset.saleforce;
+                let selectedGraduado = this.options[selectedIndex].dataset.graduado;
+                let selectedHomologacion = this.options[selectedIndex].dataset.homologacion;
+                let selectedAlumprog = this.options[selectedIndex].dataset.alumprog;
 
                 if (selectedText == "Selecciona por favor") {
                     input_tfa316.value = "";
@@ -168,6 +180,9 @@
                     input_tfa519.value = "";
                     input_tfa521.value = "";
                     input_tfa553.value = "";
+                    input_tfa606.value = "";
+                    input_tfa608.value = "";
+                    input_tfa614.value = "";
                 } else {
                     input_tfa316.value = selectedValue;
                     input_tfa198.value = selectedCodSede;
@@ -175,6 +190,10 @@
                     input_tfa519.value = selectedAnoCursada;
                     input_tfa521.value = selectedModalidad;
                     input_tfa553.value = selectedSaleforce;
+                    input_tfa606.value = selectedGraduado;
+                    input_tfa608.value = selectedHomologacion;
+                    input_tfa614.value = selectedAlumprog;
+
                 }
             });
         }
@@ -213,9 +232,9 @@
 
                 select_tfa423.innerHTML = '<option value="" disabled selected>Selecciona por favor</option>';
 
+                //const webservice2 = "https://pagos.barcelo.edu.ar/backend_fa/ws_formassembly_new.php";
 
-
-                let urlWsTipoCaso = webservice + "?ws_name=tipoCaso&sede=" + input_tfa198.value;
+                let urlWsTipoCaso = webservice + "?ws_name=tipoCaso&sede=" + input_tfa198.value + "&ipo=" + input_tfa316.value + "&marca=" + input_tfa606.value + "&alumprog=" + input_tfa614.value;
 
                 fetch(urlWsTipoCaso, {
                     method: 'POST',
@@ -319,7 +338,9 @@
                 input_tfa537.value = "";
                 focusInOut(input_tfa457, input_tfa457_d);
 
-                let urlWsSubtipoCaso = webservice + "?ws_name=subtipoCaso&tipo_caso=" + input_tfa422.value + "&sede=" + input_tfa198.value + "&ipo=" + input_tfa316.value + "&nivel=" + input_tfa519.value;
+                //const webservice2 = "https://pagos.barcelo.edu.ar/backend_fa/ws_formassembly_new.php";
+
+                let urlWsSubtipoCaso = webservice + "?ws_name=subtipoCaso&tipo_caso=" + input_tfa422.value + "&sede=" + input_tfa198.value + "&ipo=" + input_tfa316.value + "&nivel=" + input_tfa519.value + "&marca=" + input_tfa606.value + "&alumprog=" + input_tfa614.value;
 
                 fetch(urlWsSubtipoCaso, {
                     method: 'POST',
@@ -524,7 +545,7 @@
 
                         // Agrega el evento change para actualizar el input oculto
                         $('#tfa_505-fa select').on('change', function () {
-                            input_tfa505.value="";
+                            input_tfa505.value = "";
 
                             // Obtiene las opciones seleccionadas
                             let selectedOptions = $(this).find(':selected');
@@ -1528,40 +1549,394 @@
 
         /******* FIN TRAMITES - INPUT TFA596 *******/
 
-        /******* FUNCTIONS *******/
-/*
-        function contenedorSelect(labelText, select_tfa, input_tfa, id_tfa, display) {
-            const div_content = document.createElement('div'); 7
-            let new_id = id_tfa + "-fa";
-            div_content.className = "oneField field-container-D";
 
-            if (display == "oculto") {
-                div_content.className = "oneField field-container-D diplay-none";
-            } else if (display == "offstate") {
-                div_content.className = "oneField field-container-D offstate";
-            }
+        /******* A QUE VESPERTINA - INPUT TFA602 *******/
+        const input_tfa602 = document.getElementById("tfa_602");
+        const input_tfa602_d = document.getElementById("tfa_602-D");
+        const select_tfa602 = document.createElement('select');
 
-            div_content.setAttribute("id", new_id);
+        if (input_tfa602.value == "") {
 
-            const label_select = document.createElement('label');
-            label_select.className = "label preField reqMark";
-            label_select.textContent = labelText;
-            div_content.appendChild(label_select);
-            //div_content.appendChild(document.createElement('br'));
+            let firstOption_tfa602 = document.createElement('option');
+            firstOption_tfa602.textContent = "Selecciona por favor";
+            firstOption_tfa602.value = '';
+            firstOption_tfa602.disabled = true;
+            firstOption_tfa602.selected = true;
+            select_tfa602.appendChild(firstOption_tfa602);
 
-            const div_content_input = document.createElement('div');
-            div_content_input.className = "inputWrapper";
+            select_tfa316.addEventListener("change", function () {
 
-            div_content_input.appendChild(select_tfa);
-            div_content.appendChild(div_content_input);
+                let urlWsActVespertinas = webservice + "?ws_name=actVesp";
 
-            // Inserta el select después del input hidden
-            input_tfa.insertAdjacentElement('afterend', div_content);
+                fetch(urlWsActVespertinas, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+
+                })
+                    .then(response => response.json())
+                    .then(data => {
+
+                        // Agrega las opciones al select
+                        data.forEach(function (d) {
+                            let option = document.createElement('option');
+                            option.textContent = d["D_DATO"];
+                            option.value = d["D_DATO"];
+                            //option.setAttribute("data-ano", d["ANO_CARRERA"]);
+                            select_tfa602.appendChild(option);
+                        });
+
+                        contenedorSelect("¿A qué vespertina?", select_tfa602, input_tfa602_d, input_tfa602);
+
+                        //const input_tfa602_fa = document.getElementById("tfa_602-D-fa");
+                        //input_tfa602_d.appendChild(input_tfa602_fa);
+
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+            })
+
+
+            // Escucha el evento change en el select
+            select_tfa602.addEventListener('change', function () {
+                // Actualiza el valor del input hidden con el valor seleccionado del select
+                let selectedIndex = this.selectedIndex;
+                let selectedText = this.options[selectedIndex].text;
+                let selectedValue = this.value;
+
+                if (selectedText == "Selecciona por favor") {
+                    input_tfa602.value = "";
+                } else {
+                    input_tfa602.value = selectedText;
+
+                    focusInOut(input_tfa602, input_tfa602_d);
+                }
+            });
+
+
+            select_tfa423.addEventListener('change', function () {
+                let selectedValue = this.value;
+                const input_tfa602_fa = document.getElementById("tfa_602-fa");
+                const input_tfa602 = document.getElementById("tfa_602");
+
+                let dataCondition = input_tfa602.getAttribute('data-condition').replace(/`/g, "");
+
+                let dataConditionArray = dataCondition.split(",");
+
+                if (!input_tfa457.value.includes(dataConditionArray[2])) {
+                    input_tfa602_fa.classList.add("offstate");
+                    select_tfa602.setAttribute("disabled", true);
+                } else {
+                    input_tfa602_fa.classList.remove("offstate");
+                    select_tfa602.removeAttribute("disabled");
+                }
+            })
         }
-*/
 
-function contenedorSelect(labelText, select_tfa, input_tfa_d, input_tfa) {
-            let labelElement = document.getElementById(input_tfa.id+"-L");
+        /******* FIN A QUE VESPERTINA - INPUT TFA602 *******/
+
+
+
+        /******* A QUE HOSPITAL - INPUT TFA604 *******/
+        const input_tfa604 = document.getElementById("tfa_604");
+        const input_tfa604_d = document.getElementById("tfa_604-D");
+        const select_tfa604 = document.createElement('select');
+
+        if (input_tfa604.value == "") {
+
+            let firstOption_tfa604 = document.createElement('option');
+            firstOption_tfa604.textContent = "Selecciona por favor";
+            firstOption_tfa604.value = '';
+            firstOption_tfa604.disabled = true;
+            firstOption_tfa604.selected = true;
+            select_tfa604.appendChild(firstOption_tfa604);
+
+            select_tfa316.addEventListener("change", function () {
+
+                let urlWsListaHospVesp = webservice + "?ws_name=listHospVesp";
+
+                fetch(urlWsListaHospVesp, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+
+                })
+                    .then(response => response.json())
+                    .then(data => {
+
+                        // Agrega las opciones al select
+                        data.forEach(function (d) {
+                            let option = document.createElement('option');
+                            option.textContent = d["D_DATO"];
+                            option.value = d["D_DATO"];
+                            //option.setAttribute("data-ano", d["ANO_CARRERA"]);
+                            select_tfa604.appendChild(option);
+                        });
+
+                        contenedorSelect("¿A qué hospital?", select_tfa604, input_tfa604_d, input_tfa604);
+
+                        //const input_tfa604_fa = document.getElementById("tfa_604-D-fa");
+                        //input_tfa604_d.appendChild(input_tfa604_fa);
+
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+            })
+
+
+            // Escucha el evento change en el select
+            select_tfa604.addEventListener('change', function () {
+                // Actualiza el valor del input hidden con el valor seleccionado del select
+                let selectedIndex = this.selectedIndex;
+                let selectedText = this.options[selectedIndex].text;
+                let selectedValue = this.value;
+
+                if (selectedText == "Selecciona por favor") {
+                    input_tfa604.value = "";
+                } else {
+                    input_tfa604.value = selectedText;
+
+                    focusInOut(input_tfa604, input_tfa604_d);
+                }
+            });
+
+
+            select_tfa423.addEventListener('change', function () {
+                let selectedValue = this.value;
+                const input_tfa604_fa = document.getElementById("tfa_604-fa");
+                const input_tfa604 = document.getElementById("tfa_604");
+
+                let dataCondition = input_tfa604.getAttribute('data-condition').replace(/`/g, "");
+
+                let dataConditionArray = dataCondition.split(",");
+
+                if (!input_tfa457.value.includes(dataConditionArray[2])) {
+                    input_tfa604_fa.classList.add("offstate");
+                    select_tfa604.setAttribute("disabled", true);
+                } else {
+                    input_tfa604_fa.classList.remove("offstate");
+                    select_tfa604.removeAttribute("disabled");
+                }
+            })
+        }
+
+        /******* FIN A QUE HOSPITAL - INPUT TFA604 *******/
+
+
+        /******* MODALIDAD ENVIO DOCUMENTACION - INPUT TFA650 *******/
+        const input_tfa650 = document.getElementById("tfa_650");
+        const input_tfa650_d = document.getElementById("tfa_650-D");
+        const select_tfa650 = document.createElement('select');
+
+        if (input_tfa650.value == "") {
+
+            let firstOption_tfa650 = document.createElement('option');
+            firstOption_tfa650.textContent = "Selecciona por favor";
+            firstOption_tfa650.value = '';
+            firstOption_tfa650.disabled = true;
+            firstOption_tfa650.selected = true;
+            select_tfa650.appendChild(firstOption_tfa650);
+
+
+            let urlWsModEnvioDoc = webservice + "?ws_name=ModEnvioDoc";
+
+            fetch(urlWsModEnvioDoc, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+
+            })
+                .then(response => response.json())
+                .then(data => {
+
+                    // Agrega las opciones al select
+                    data.forEach(function (d) {
+                        let option = document.createElement('option');
+                        option.textContent = d["MOD_ENVIO_DOC"];
+                        option.value = d["MOD_ENVIO_DOC"];
+                        //option.setAttribute("data-ano", d["ANO_CARRERA"]);
+                        select_tfa650.appendChild(option);
+                    });
+
+                    contenedorSelect("Modalidad de envío de la documentación", select_tfa650, input_tfa650_d, input_tfa650);
+
+                    //const input_tfa650_fa = document.getElementById("tfa_650-D-fa");
+                    //input_tfa650_d.appendChild(input_tfa650_fa);
+
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+
+
+
+            // Escucha el evento change en el select
+            select_tfa650.addEventListener('change', function () {
+                // Actualiza el valor del input hidden con el valor seleccionado del select
+                let selectedIndex = this.selectedIndex;
+                let selectedText = this.options[selectedIndex].text;
+                let selectedValue = this.value;
+
+                if (selectedText == "Selecciona por favor") {
+                    input_tfa650.value = "";
+                } else {
+                    input_tfa650.value = selectedText;
+
+                    focusInOut(input_tfa650, input_tfa650_d);
+                }
+            });
+
+
+            select_tfa423.addEventListener('change', function () {
+                let selectedValue = this.value;
+                const input_tfa650_fa = document.getElementById("tfa_650-fa");
+                const input_tfa650 = document.getElementById("tfa_650");
+
+                let dataCondition = input_tfa650.getAttribute('data-condition').replace(/`/g, "");
+
+                let dataConditionArray = dataCondition.split(",");
+
+                if (!input_tfa457.value.includes(dataConditionArray[2])) {
+                    input_tfa650_fa.classList.add("offstate");
+                    select_tfa650.setAttribute("disabled", true);
+                } else {
+                    input_tfa650_fa.classList.remove("offstate");
+                    select_tfa650.removeAttribute("disabled");
+                }
+            })
+        }
+
+        /******* FIN MODALIDAD ENVIO DOCUMENTACION - INPUT TFA650 *******/
+
+
+        /******* PAÍS DESTINO - INPUT TFA652 *******/
+
+        const input_tfa652 = document.getElementById("tfa_652");
+        const input_tfa652_d = document.getElementById("tfa_652-D");
+        const select_tfa652 = document.createElement('select');
+
+        if (input_tfa652.value == "") {
+
+            let firstOption_tfa652 = document.createElement('option');
+            firstOption_tfa652.textContent = "Selecciona por favor";
+            select_tfa652.appendChild(firstOption_tfa652);
+
+            let urlWsPaises = webservice + "?ws_name=paises";
+
+            fetch(urlWsPaises, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            })
+                .then(response => response.json())
+                .then(data => {
+                    // Agrega las opciones al select
+                    data.forEach(function (d) {
+                        let option = document.createElement('option');
+                        option.textContent = d["D_PAIS"];
+                        option.value = d["N_ID_PAIS"];
+                        option.classList.add(d["SF_ID_PAIS"]);
+                        select_tfa652.appendChild(option);
+                    });
+
+                    contenedorSelect("País de destino", select_tfa652, input_tfa652_d, input_tfa652);
+
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+
+            // Escucha el evento change en el select
+            select_tfa652.addEventListener('change', function () {
+                // Actualiza el valor del input hidden con el valor seleccionado del select
+                let selectedIndex = this.selectedIndex;
+                let selectedText = this.options[selectedIndex].text;
+                let selectedValue = this.value;
+                let selectIdSaleforce = this.options[selectedIndex].className;
+
+                if (selectedText == "Selecciona por favor") {
+                    input_tfa652.value = "";
+                } else {
+                    input_tfa652.value = selectIdSaleforce;
+                }
+            });
+
+            select_tfa423.addEventListener('change', function () {
+                let selectedValue = this.value;
+                const input_tfa652_fa = document.getElementById("tfa_652-fa");
+                const input_tfa652 = document.getElementById("tfa_652");
+
+                let dataCondition = input_tfa652.getAttribute('data-condition').replace(/`/g, "");
+
+                let dataConditionArray = dataCondition.split(",");
+
+                if (!input_tfa457.value.includes(dataConditionArray[2])) {
+                    input_tfa652_fa.classList.add("offstate");
+                    select_tfa652.setAttribute("disabled", true);
+                } else {
+                    input_tfa652_fa.classList.remove("offstate");
+                    select_tfa652.removeAttribute("disabled");
+                }
+            })
+        }
+
+        /******* FIN PAÍS DESTINO - INPUT TFA652 *******/
+
+        /******* FIN SIMULADOR - INPUT TFA600 *******/
+        const input_tfa600 = document.getElementById('tfa_600');
+        const submit_button = document.getElementById('submit_button');
+
+        if (input_tfa600.value == "SI") {
+            submit_button.disabled = true;
+            submit_button.style.display = 'none';
+        }
+
+        /******* FIN SIMULADOR - INPUT TFA600 *******/
+
+
+
+
+
+        /******* FUNCTIONS *******/
+        /*
+                function contenedorSelect(labelText, select_tfa, input_tfa, id_tfa, display) {
+                    const div_content = document.createElement('div'); 7
+                    let new_id = id_tfa + "-fa";
+                    div_content.className = "oneField field-container-D";
+        
+                    if (display == "oculto") {
+                        div_content.className = "oneField field-container-D diplay-none";
+                    } else if (display == "offstate") {
+                        div_content.className = "oneField field-container-D offstate";
+                    }
+        
+                    div_content.setAttribute("id", new_id);
+        
+                    const label_select = document.createElement('label');
+                    label_select.className = "label preField reqMark";
+                    label_select.textContent = labelText;
+                    div_content.appendChild(label_select);
+                    //div_content.appendChild(document.createElement('br'));
+        
+                    const div_content_input = document.createElement('div');
+                    div_content_input.className = "inputWrapper";
+        
+                    div_content_input.appendChild(select_tfa);
+                    div_content.appendChild(div_content_input);
+        
+                    // Inserta el select después del input hidden
+                    input_tfa.insertAdjacentElement('afterend', div_content);
+                }
+        */
+
+        function contenedorSelect(labelText, select_tfa, input_tfa_d, input_tfa) {
+            let labelElement = document.getElementById(input_tfa.id + "-L");
             const div_content = document.createElement('div');
             let new_id = input_tfa.id + "-fa";
             div_content.className = "oneField field-container-D";
@@ -1571,7 +1946,7 @@ function contenedorSelect(labelText, select_tfa, input_tfa_d, input_tfa) {
             const hasOffstate = input_tfa_d.classList.contains("offstate");
 
 
-            if( hasOffstate ) {
+            if (hasOffstate) {
                 div_content.className = "oneField field-container-D offstate";
             }
 
@@ -1588,7 +1963,7 @@ function contenedorSelect(labelText, select_tfa, input_tfa_d, input_tfa) {
                 label_select.className = "label preField";
             }
 
-            if( hasOffstate ){
+            if (hasOffstate) {
                 select_tfa.setAttribute("disabled", true);
             }
 

@@ -11,11 +11,13 @@
     #tfa_734-D>.inputWrapper {
         display: none;
     }
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
-
+    
+    
     document.addEventListener("DOMContentLoaded", function () {
 
         const webservice = "https://pagos.barcelo.edu.ar/backend_fa/ws_formassembly.php";
@@ -33,6 +35,80 @@
 
         let exigenciaCampoPractico = "";
         let exigenciaSedePreferencia = "";
+
+
+        /******* UNIVERSIDAD - INPUT TFA245 *******/
+
+        const input_tfa245 = document.getElementById("tfa_245");
+        const input_tfa245_d = document.getElementById("tfa_245-D");
+        const select_tfa245 = document.createElement('select');
+        let urlWsUniversidades = webservice + "?ws_name=universidades";
+
+        const input_tfa246_d = document.getElementById("tfa_246-D");
+        const input_tfa246 = document.getElementById("tfa_246");
+
+        if (input_tfa245.value == "") {
+            select_tfa245.className = "required";
+
+            let firstOption_tfa245 = document.createElement('option');
+            firstOption_tfa245.textContent = "Selecciona por favor";
+            select_tfa245.appendChild(firstOption_tfa245);
+
+            fetch(urlWsUniversidades, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            })
+                .then(response => response.json())
+                .then(data => {
+
+                    // Agrega las opciones al select
+                    data.forEach(function (d) {
+                        let option = document.createElement('option');
+                        option.textContent = d["D_UNIVERSIDAD"];
+                        option.value = d["SF_ID_UNIVERSIDAD"];
+                        select_tfa245.appendChild(option);
+                    });
+
+                    contenedorSelect("¿En cuál?", select_tfa245, input_tfa245_d, input_tfa245_d.id);
+
+                    const input_tfa245_fa = document.getElementById("tfa_245-D-fa");
+
+                    //input_tfa245_d.appendChild(input_tfa245_fa);
+                    input_tfa245.insertAdjacentElement('afterend', input_tfa245_d);
+
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+
+            // Escucha el evento change en el select
+            select_tfa245.addEventListener('change', function () {
+                // Actualiza el valor del input hidden con el valor seleccionado del select
+                let selectedIndex = this.selectedIndex;
+                let selectedText = this.options[selectedIndex].text;
+                let selectedValue = this.value;
+
+                if (selectedText == "Selecciona por favor") {
+                    input_tfa245.value = "";
+                } else {
+                    input_tfa245.value = selectedValue;
+
+                    //focusInOut(input_tfa245, input_tfa245_d);
+                    let tfa245_div = document.querySelector('#tfa_245-D > .inputWrapper');
+                    tfa245_div.style.display = 'block';
+                    input_tfa245.focus();
+                    input_tfa245.blur();
+                    tfa245_div.style.display = 'none';
+                }
+            });
+        }
+
+        /******* FIN UNIVERSIDAD - INPUT TFA245 *******/
+
+
+
 
         /******* UNIVERSIDAD ENFERMERIA - INPUT TFA734 *******/
         const input_tfa732 = document.getElementById("tfa_732");
@@ -404,6 +480,8 @@
                     input_tfa67.value = "";
                 } else {
                     input_tfa67.value = selectedValue;
+
+                    focusInOut(input_tfa67, input_tfa67_d);
                 }
             });
         }
@@ -416,43 +494,48 @@
         const input_tfa332_d = document.getElementById("tfa_332-D");
         const select_tfa332 = document.createElement('select');
 
+        input_tfa829.addEventListener("change", function(){
 
-
-        select_tfa332.className = "required";
-
-        let firstOption_tfa332 = document.createElement('option');
-        firstOption_tfa332.textContent = "Selecciona por favor";
-        select_tfa332.appendChild(firstOption_tfa332);
-
-        let urlWsSedeReferenciaCombo = webservice + "?ws_name=sedeReferenciaCombo";
-
-        fetch(urlWsSedeReferenciaCombo, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            if(input_tfa829.value == "SI"){
+    
+                select_tfa332.className = "required";
+        
+                let firstOption_tfa332 = document.createElement('option');
+                firstOption_tfa332.textContent = "Selecciona por favor";
+                select_tfa332.appendChild(firstOption_tfa332);
+        
+                let urlWsSedeReferenciaCombo = webservice + "?ws_name=sedeReferenciaCombo";
+        
+                fetch(urlWsSedeReferenciaCombo, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        // Agrega las opciones al select
+                        data.forEach(function (d) {
+                            let option = document.createElement('option');
+                            option.textContent = d["D_DATO"];
+                            option.value = d["C_DATO"];
+                            select_tfa332.appendChild(option);
+                        });
+        
+                        contenedorSelect("Sede de preferencia para rendir los exámenes", select_tfa332, input_tfa332_d, input_tfa332_d.id);
+        
+                        const input_tfa332_fa = document.getElementById("tfa_332-D-fa");
+        
+                        input_tfa332_d.insertAfter(input_tfa332_fa);
+        
+        
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+            }
         })
-            .then(response => response.json())
-            .then(data => {
-                // Agrega las opciones al select
-                data.forEach(function (d) {
-                    let option = document.createElement('option');
-                    option.textContent = d["D_DATO"];
-                    option.value = d["C_DATO"];
-                    select_tfa332.appendChild(option);
-                });
 
-                contenedorSelect("Sede de preferencia para rendir los exámenes", select_tfa332, input_tfa332_d, input_tfa332_d.id);
-
-                const input_tfa332_fa = document.getElementById("tfa_332-D-fa");
-
-                input_tfa332_d.appendChild(input_tfa332_fa);
-
-
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
 
         // Escucha el evento change en el select
         select_tfa332.addEventListener('change', function () {
@@ -477,44 +560,51 @@
         const input_tfa519_d = document.getElementById("tfa_519-D");
         const select_tfa519 = document.createElement('select');
 
+        input_tfa831.addEventListener("change", function(){
 
+            if(input_tfa831.value == "SI"){
 
+                select_tfa519.className = "required";
+        
+                let firstOption_tfa519 = document.createElement('option');
+                firstOption_tfa519.textContent = "Selecciona por favor";
+                select_tfa519.appendChild(firstOption_tfa519);
+        
+                let urlWsCampoPracticoCombo = webservice + "?ws_name=campoPracticoCombo";
+        
+                fetch(urlWsCampoPracticoCombo, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        // Agrega las opciones al select
+                        data.forEach(function (d) {
+                            let option = document.createElement('option');
+                            option.textContent = d["D_DESCRED"];
+                            option.value = d["N_ID_ESPACIO"];
+                            select_tfa519.appendChild(option);
+                        });
+        
+        
+                        contenedorSelect("¿En cuál de los siguientes ámbitos realizarás la cursada de tus prácticas integradas supervisadas? Las asignaturas con carga horaria teórica se cursan enteramente en modalidad a distancia y las prácticas requieren de tu asistencia presencial diaria obligatoria en los ámbitos detallados durante todo el desarrollo.", select_tfa519, input_tfa519_d, input_tfa519_d.id);
+        
+                        const input_tfa519_fa = document.getElementById("tfa_519-D-fa");
+        
+                        input_tfa519_d.insertAfter(input_tfa519_fa);
+        
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
 
-        select_tfa519.className = "required";
+            }
 
-        let firstOption_tfa519 = document.createElement('option');
-        firstOption_tfa519.textContent = "Selecciona por favor";
-        select_tfa519.appendChild(firstOption_tfa519);
-
-        let urlWsCampoPracticoCombo = webservice + "?ws_name=campoPracticoCombo";
-
-        fetch(urlWsCampoPracticoCombo, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
         })
-            .then(response => response.json())
-            .then(data => {
-                // Agrega las opciones al select
-                data.forEach(function (d) {
-                    let option = document.createElement('option');
-                    option.textContent = d["D_DESCRED"];
-                    option.value = d["N_ID_ESPACIO"];
-                    select_tfa519.appendChild(option);
-                });
 
 
-                contenedorSelect("¿En cuál de los siguientes ámbitos realizarás la cursada de tus prácticas integradas supervisadas? Las asignaturas con carga horaria teórica se cursan enteramente en modalidad a distancia y las prácticas requieren de tu asistencia presencial diaria obligatoria en los ámbitos detallados durante todo el desarrollo.", select_tfa519, input_tfa519_d, input_tfa519_d.id);
-
-                const input_tfa519_fa = document.getElementById("tfa_519-D-fa");
-
-                input_tfa519_d.appendChild(input_tfa519_fa);
-
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
 
         // Escucha el evento change en el select
         select_tfa519.addEventListener('change', function () {
@@ -680,7 +770,7 @@
         const select_tfa827 = document.createElement('select');
 
         if (input_tfa827.value == "") {
-            select_tfa827.className = "required";
+            //select_tfa827.className = "required";
 
             let firstOption_tfa827 = document.createElement('option');
             firstOption_tfa827.textContent = "Selecciona por favor";
@@ -689,7 +779,10 @@
             firstOption_tfa827.selected = true;
             select_tfa827.appendChild(firstOption_tfa827);
 
-            contenedorSelect("Tercera preferencia de turno", select_tfa827, input_tfa827_d);
+            contenedorSelect("Tercera preferencia de turno", select_tfa827, input_tfa827_d, input_tfa827.id);
+
+            let input_tfa828_fa = document.querySelector('#tfa_827-fa label');
+            input_tfa828_fa.classList.remove('reqMark');
 
             select_tfa825.addEventListener("change", function () {
                 input_tfa827.value = "";
@@ -1302,7 +1395,7 @@
                 } else {
                     input_tfa9.value = selectedValue;
 
-                    focusInOut(input_tfa9, input_tfa9_d);
+                    //focusInOut(input_tfa9, input_tfa9_d);
                 }
             });
         }
@@ -1830,6 +1923,8 @@
             input.focus();
             input.blur();
             input_d.classList.add('wf-acl-hidden');
+            const event = new Event('change', { bubbles: true });
+            input.dispatchEvent(event);
         }
 
         function nombrePropio(texto) {

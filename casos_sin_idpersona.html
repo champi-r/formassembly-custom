@@ -96,6 +96,7 @@
         input.tfa26 = document.getElementById("tfa_26"); // Auto responder
         input.tfa28 = document.getElementById("tfa_28"); // Cola atención
         input.tfa30 = document.getElementById("tfa_30");  // Cod. cola atención
+        input.tfa34 = document.getElementById("tfa_34");  // tipo de caso etiqueta
 
         /******* VALIDACIÓN USUARIO *******/
 
@@ -307,15 +308,17 @@
                 console.log(data['po_c_error']);
 
                 if (data['po_c_error'] == null) {
-                    input.tfa4.value = data['po_n_id_alu_prog'];
+                    input.tfa4.value = data['po_n_id_persona'];
                     input.tfa18.value = data['po_id_salesforce_prog_alu'];
-                    input.tfa6.value = data['po_codprograma'];
+                    input.tfa6.value = data['po_id_salesforce_prog_alu'];
                     input.tfa8.value = data['po_programa'];
                     input.tfa10.value = data['po_c_sede'];
                     input.tfa12.value = data['po_d_descrip_sede'];
                     input.tfa14.value = data['po_ano_cursada'];
                     input.tfa16.value = data['po_modalidad_cursada'];
 
+                    // tipo caso
+                    input.tfa34.value = "Acceso a SIGEDU y Campus Virtual";
                     input.tfa20.value = 2;
                     focusInOut(input.tfa20, input.tfa20_d);
 
